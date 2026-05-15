@@ -192,7 +192,7 @@ if __name__ == "__main__":
     print(f"📁  States:    {STATES_PATH}")
     print(f"📁  Responses: {RESPONSES_PATH}")
     print(f"     Configura en Proxyman: Map Remote")
-    print(f"     PATCH ...pocket-bff/users/me/loyalty/status  →  http://localhost:{PORT}/pocket-bff/users/me/loyalty/status")
+    print(f"     ANY ...pocket-bff/users/me/loyalty/*  →  http://localhost:{PORT}/pocket-bff/users/me/loyalty/*")
     print("     Presiona Ctrl+C para detener\n")
     try:
         server.serve_forever()

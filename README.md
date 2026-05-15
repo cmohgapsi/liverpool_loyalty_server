@@ -1,15 +1,23 @@
 # Proxyman — Mock de flujo de Lealtad
 
-Simula las transiciones de estado del sistema de lealtad interceptando un `PATCH` y modificando la respuesta del `GET` subsecuente, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
+Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
+
+Atiende tres endpoints:
+
+| Método | Path | Descripción |
+|---|---|---|
+| `GET` | `/pocket-bff/users/me/loyalty/status` | Devuelve `current_state.json` |
+| `GET` | `/pocket-bff/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
+| `PATCH` | `/pocket-bff/users/me/loyalty/status` | Aplica transición de estado y devuelve el response correspondiente |
 
 ---
 
 ## Estructura de archivos
 
 ```
-proxyman-loyalty/
+decommission/
 ├── states/
-│   ├── current_state.json              ← Map Local apunta aquí (GET)
+│   ├── current_state.json              ← Estado actual (leído por el GET de status)
 │   ├── enrolled_welcome_state.json
 │   ├── enrolled_none_state.json
 │   ├── notEnrolled_enroll_state.json
@@ -20,8 +28,11 @@ proxyman-loyalty/
 │   ├── path_status_notEnrolled_enroll.json
 │   ├── path_status_enrolled.json
 │   ├── path_status_declined.json
-│   └── path_status_unenroll.json
-├── loyalty_server.py                     ← Servidor local (único archivo necesario)
+│   ├── path_status_unenroll.json
+│   ├── get_loyalty_coupons_enrolled_empty.json
+│   └── get_loyalty_coupons_enrolled_full.json
+├── loyalty_server.py                   ← Servidor local
+├── state_utils.py                      ← Utilidades compartidas de estado
 └── README.md
 ```
 
@@ -35,40 +46,53 @@ proxyman-loyalty/
 
 ---
 
-## Setup en Proxyman
+## Configuración
 
-### 1. Map Local — GET de usuario
+### Variables globales en `loyalty_server.py`
 
-| Campo | Valor |
-|---|---|
-| URL | `https://ogcp-apigke-qa1.liverpool.com.mx/pocket-bff/users/me` |
-| Método | `GET` |
-| Local file | `…/states/current_state.json` |
-| Opción | ✅ **Use file content as raw HTTP response** |
-
-### 2. Map Remote — PATCH de estado de lealtad
-
-Redirige el PATCH directamente al servidor local. No se necesita ningún Script.
-
-| Campo | Valor |
-|---|---|
-| Match URL | `https://ogcp-apigke-qa1.liverpool.com.mx/pocket-bff/users/me/loyalty/status` |
-| Método | `PATCH` |
-| Redirect to | `http://localhost:9876/loyalty/status` |
+| Variable | Valores | Descripción |
+|---|---|---|
+| `BASE_PATH` | ruta absoluta | Directorio raíz de la carpeta `decommission/` |
+| `PORT` | `9876` | Puerto del servidor local |
+| `COUPONS_LIST_SUFFIX` | `"empty"` · `"full"` | Controla qué archivo de cupones se sirve en el GET `/loyalty/coupons` |
 
 ---
 
-## Cómo ejecutar la prueba
+## Setup en Proxyman
 
-### Paso 1 — Iniciar el servidor
+### Map Remote — GET de loyalty status
 
-Abre una terminal y deja corriendo:
+| Campo | Valor |
+|---|---|
+| Match URL | `https://<host>/pocket-bff/users/me/loyalty/status` |
+| Método | `GET` |
+| Redirect to | `http://localhost:9876/pocket-bff/users/me/loyalty/status` |
+
+### Map Remote — GET de cupones
+
+| Campo | Valor |
+|---|---|
+| Match URL | `https://<host>/pocket-bff/loyalty/coupons` |
+| Método | `GET` |
+| Redirect to | `http://localhost:9876/pocket-bff/loyalty/coupons` |
+
+### Map Remote — PATCH de estado de lealtad
+
+| Campo | Valor |
+|---|---|
+| Match URL | `https://<host>/pocket-bff/users/me/loyalty/status` |
+| Método | `PATCH` |
+| Redirect to | `http://localhost:9876/pocket-bff/users/me/loyalty/status` |
+
+---
+
+## Cómo ejecutar
 
 ```bash
 python3 /ruta/a/decommission/loyalty_server.py
 ```
 
-Deberías ver:
+Salida esperada:
 
 ```
 🚀  Loyalty server corriendo en http://localhost:9876
@@ -78,63 +102,72 @@ Deberías ver:
 
 > Mantén esta terminal abierta durante toda la sesión de prueba.
 
-### Paso 2 — Verificar el estado inicial
+---
 
-`current_state.json` arranca con `notEnrolled + displayEnrollModal`. El `GET` desde la app debería mostrar el modal de enrolamiento.
+## Endpoints
 
-### Paso 3 — Disparar los escenarios
+### GET `/pocket-bff/users/me/loyalty/status`
 
-Ejecuta el `PATCH` desde la app con los siguientes bodies:
+Devuelve el contenido actual de `states/current_state.json` e imprime en consola el status y action del estado actual.
+
+```
+📨  GET /pocket-bff/users/me/loyalty/status
+  ┌───────────────────────────────────────────────────────────────────────────────┐
+  │  STATUS      →  status = ENROLLED    , action = NONE                         │
+  └───────────────────────────────────────────────────────────────────────────────┘
+📤  Retornando current_state.json
+```
 
 ---
 
-**Escenario 1 · Enrolamiento iniciado** → muestra welcome modal
+### GET `/pocket-bff/loyalty/coupons`
+
+Devuelve `responses/get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json`.
+
+Para cambiar entre lista vacía y lista completa, edita la variable en `loyalty_server.py`:
+
+```python
+COUPONS_LIST_SUFFIX = "empty"  # "empty" | "full"
+```
+
+```
+📨  GET /pocket-bff/loyalty/coupons  [suffix=full]
+📤  Retornando get_loyalty_coupons_enrolled_full.json
+```
+
+---
+
+### PATCH `/pocket-bff/users/me/loyalty/status`
+
+Recibe un body JSON con `action` y `value`, aplica la transición de estado correspondiente y devuelve el response del escenario.
+
+**Body esperado:**
 ```json
-{ "action": "displayWelcomeModal", "value": true }
+{ "action": "<action>", "value": true }
 ```
-Estado siguiente: `enrolled_welcome` · Respuesta: `path_status_enroll_welcome.json`
 
----
+**Escenarios disponibles:**
 
-**Escenario 2 · Modal de enrolamiento** → muestra enroll modal
-```json
-{ "action": "displayEnrollModal", "value": true }
-```
-Estado siguiente: `notEnrolled_enroll` · Respuesta: `path_status_notEnrolled_enroll.json`
+| `action` | `value` | Estado siguiente | Respuesta |
+|---|---|---|---|
+| `displayWelcomeModal` | `true` | `enrolled_welcome_state` | `path_status_enroll_welcome` |
+| `displayEnrollModal` | `true` | `notEnrolled_enroll_state` | `path_status_notEnrolled_enroll` |
+| `welcomeModalClosed` | `true` | `enrolled_none_state` | `path_status_enrolled` |
+| `enrollModalClosed` | `true` | `declined_none_state` | `path_status_declined` |
+| `unenroll` | `true` | `unenrolled_none_state` | `path_status_unenroll` |
 
----
+Si el `action` no coincide con ningún escenario, el servidor responde `200` con `"No scenario matched"` y **no modifica** `current_state.json`.
 
-**Escenario 3 · Cuenta creada** → cierra welcome modal
-```json
-{ "action": "welcomeModalClosed", "value": true }
-```
-Estado siguiente: `enrolled_none` · Respuesta: `path_status_enrolled.json`
-
----
-
-**Escenario 4 · Enrolamiento declinado** → cierra enroll modal
-```json
-{ "action": "enrollModalClosed", "value": true }
-```
-Estado siguiente: `declined_none` · Respuesta: `path_status_declined.json`
-
----
-
-**Escenario 5 · Desenrolamiento**
-```json
-{ "action": "unenroll", "value": true }
-```
-Estado siguiente: `unenrolled_none` · Respuesta: `path_status_unenroll.json`
-
----
-
-### Paso 4 — Verificar la transición
-
-Después de cada `PATCH`, el `GET` ya devolverá el nuevo estado. En la terminal del servidor verás la transición confirmada:
+Salida en consola tras una transición exitosa:
 
 ```
-📨  PATCH recibido → action='welcomeModalClosed', value=True
+📨  PATCH /pocket-bff/users/me/loyalty/status → action='welcomeModalClosed', value=True
 ✅  enrolled_none_state.json  →  current_state.json
+  ┌─────────────────────────────────────────────────────────────────────────────────────────┐
+  │  BEFORE            →  status = NOT_ENROLLED , action = DISPLAYENROLLMODAL              │
+  │  PATH ACTION       →  welcomeModalClosed                                               │
+  │  AFTER             →  status = ENROLLED     , action = NONE                            │
+  └─────────────────────────────────────────────────────────────────────────────────────────┘
 📤  Retornando path_status_enrolled.json
 ```
 
@@ -152,43 +185,49 @@ cp states/enrolled_welcome_state.json states/current_state.json
 
 ---
 
-## Mapa de escenarios
-
-| `action` | `value` | Estado siguiente | Respuesta |
-|---|---|---|---|
-| `displayWelcomeModal` | `true` | `enrolled_welcome_state` | `path_status_enroll_welcome` |
-| `displayEnrollModal` | `true` | `notEnrolled_enroll_state` | `path_status_notEnrolled_enroll` |
-| `welcomeModalClosed` | `true` | `enrolled_none_state` | `path_status_enrolled` |
-| `enrollModalClosed` | `true` | `declined_none_state` | `path_status_declined` |
-| `unenroll` | `true` | `unenrolled_none_state` | `path_status_unenroll` |
-
----
-
 ## Cómo funciona
 
 ```
-App → PATCH /loyalty/status
+App → GET /pocket-bff/users/me/loyalty/status
         │
         ▼
-  Proxyman Map Remote
-  redirige a localhost:9876
+  Proxyman Map Remote → localhost:9876
+        │
+        ▼
+  loyalty_server.py
+        └─ Lee y retorna current_state.json
+        │
+        ▼
+App ← estado actual de lealtad
+
+─────────────────────────────────────────────
+
+App → GET /pocket-bff/loyalty/coupons
+        │
+        ▼
+  Proxyman Map Remote → localhost:9876
+        │
+        ▼
+  loyalty_server.py
+        └─ Lee get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json
+        │
+        ▼
+App ← lista de cupones (empty | full)
+
+─────────────────────────────────────────────
+
+App → PATCH /pocket-bff/users/me/loyalty/status
+        │
+        ▼
+  Proxyman Map Remote → localhost:9876
         │
         ▼
   loyalty_server.py
         ├─ Lee action + value del body
         ├─ Busca en SCENARIOS
         ├─ Copia state_X.json → current_state.json
-        └─ Lee y parsea responses/path_status_X.json
+        └─ Retorna responses/path_status_X.json
         │
         ▼
-App ← response del PATCH
-
-App → GET /users/me
-        │
-        ▼
-  Proxyman Map Local
-  lee current_state.json  ← ya fue actualizado
-        │
-        ▼
-App ← nuevo estado
+App ← response del PATCH con nuevo estado
 ```
