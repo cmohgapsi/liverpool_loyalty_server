@@ -1,0 +1,277 @@
+HTTP/1.1 200 OK
+x-correlation-id: 66b141f0e5a34e59e4604b6ad3a50e1a
+x-app-version: 3.892.5
+server-timing: traceparent;desc="00-66b141f0e5a34e59e4604b6ad3a50e1a-870c15fb1c0067b5-00"
+traceparent: 00-66b141f0e5a34e59e4604b6ad3a50e1a-870c15fb1c0067b5-00
+x-cloud-trace-context: 66b141f0e5a34e59e4604b6ad3a50e1a/1831182701696887700;o=0
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-xss-protection: 0
+vary: Origin
+access-control-allow-credentials: true
+content-type: application/json; charset=utf-8
+x-powered-by: GH: Alpha018, Gianfranco753
+date: Mon, 11 May 2026 23:35:22 GMT
+x-envoy-upstream-service-time: 4
+server: istio-envoy
+Via: 1.1 google
+Alt-Svc: h3=":443"; ma=2592000
+
+{
+    "status": {
+        "status": "OK",
+        "statusCode": 0
+    },
+    "globalCoupons": [],
+    "userCoupons": [],
+    "loyaltyCoupons": [
+        {
+            "offerId": "1074396820",
+            "description": "10% de descuento",
+            "startDate": "2026-04-08T13:18:00-06:00",
+            "endDate": "2026-04-30T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": null,
+            "offerType": "deal",
+            "offerName": "Prueba 1 campaña nueva",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": false,
+            "isWalletDiscount": false,
+            "couponBarcode": "107439682072010001584430042026",
+            "couponId": "1074396820",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "yellow",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Descuento"
+        },
+        {
+            "offerId": "1249976832",
+            "description": "40% MONEDERO + 20 MSI DILISA / 18 MSI EXTERNAS",
+            "startDate": "2026-01-29T06:49:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMO  %MONEDERO + MSI PERMANENTE",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": false,
+            "couponBarcode": "124997683272010001584431122035",
+            "couponId": "1249976832",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Monedero y MSI"
+        },
+        {
+            "offerId": "1019844411",
+            "description": "35% DE DESCUENTO + PAGUE EN JULIO",
+            "startDate": "2026-01-29T06:30:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMO PERMANENTE DESCUENTO % + PAGO DIFERIDO",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": false,
+            "couponBarcode": "101984441172010001584431122035",
+            "couponId": "1019844411",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Descuento"
+        },
+        {
+            "offerId": "0374376544",
+            "description": "10% DE DESCUENTO ADICIONAL",
+            "startDate": "2026-01-29T06:17:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMO DESCUENTO ADICIONAL % PERMANENTE",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": true,
+            "couponBarcode": "037437654472010001584431122035",
+            "couponId": "0374376544",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Monedero adicional"
+        },
+        {
+            "offerId": "0530371343",
+            "description": "2X1",
+            "startDate": "2026-01-29T06:00:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMOCIÓN PERMANENTE COMBO 2X1",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": false,
+            "couponBarcode": "053037134372010001584431122035",
+            "couponId": "0530371343",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Combo"
+        },
+        {
+            "offerId": "2122327085",
+            "description": "20% DE DESCUENTO + 10% ADICIONAL MONEDERO.",
+            "startDate": "2026-01-29T05:38:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMOCION  DESCUENTO% + MONEDERO% PERMANENTE",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": false,
+            "couponBarcode": "212232708572010001584431122035",
+            "couponId": "2122327085",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Descuento"
+        },
+        {
+            "offerId": "0592145783",
+            "description": "10% EN MONEDERO",
+            "startDate": "2026-01-28T06:00:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMOCION PERMANENTE % MONEDERO ADICIONAL",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": true,
+            "couponBarcode": "059214578372010001584431122035",
+            "couponId": "0592145783",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Monedero adicional"
+        },
+        {
+            "offerId": "1757631308",
+            "description": "30% EN MONEDERO",
+            "startDate": "2026-01-28T06:00:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMO PERMANENTE MONEDERO ELECTRONICO",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": true,
+            "couponBarcode": "175763130872010001584431122035",
+            "couponId": "1757631308",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Monedero"
+        },
+        {
+            "offerId": "1142523959",
+            "description": "2X1",
+            "startDate": "2026-01-28T06:00:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMOCIÓN PERMANENTE COMBO",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": false,
+            "couponBarcode": "114252395972010001584431122035",
+            "couponId": "1142523959",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Combo"
+        },
+        {
+            "offerId": "1563004821",
+            "description": "10% DE DESCUENTO ADICIONAL",
+            "startDate": "2026-01-28T06:00:00-06:00",
+            "endDate": "2035-12-31T23:59:00-06:00",
+            "desktopImage": null,
+            "mobileImage": null,
+            "campaignId": "87",
+            "offerType": "deal",
+            "offerName": "PROMOCION PERMANENTE DESCUENTO ADICIONAL",
+            "locationChannel": "Válido para todos los canales",
+            "termAndCondition": "",
+            "isGlobalCoupon": true,
+            "isWalletDiscount": false,
+            "couponBarcode": "156300482172010001584431122035",
+            "couponId": "1563004821",
+            "dealCode": null,
+            "loyaltyMemberId": "720100015844",
+            "couponType": "DEAL",
+            "displayColor": "green",
+            "displayUseCoupon": true,
+            "claimedStatus": true,
+            "hofferType": "Descuento adicional"
+        }
+    ]
+}

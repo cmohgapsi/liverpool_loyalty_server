@@ -17,12 +17,15 @@ import os
 import shutil
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
+from state_utils import extract_json_body, read_current_status
+
 # ─── Configura esta ruta ──────────────────────────────────────────────────────
 BASE_PATH      = "/Users/carlosmoh/acorde/development/gapsi/lealtad/proxyman/decommission"
 STATES_PATH    = os.path.join(BASE_PATH, "states")
 RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
 PORT           = 9876
+COUPONS_LIST_SUFFIX = "empty"  # "empty" | "full"
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Mapa de escenarios: (action, value) → (state_file, response_file)
@@ -50,19 +53,15 @@ SCENARIOS = {
 }
 
 
-def extract_json_body(raw: str) -> dict:
-    """Extrae el JSON de un archivo raw HTTP (ignora la línea de status y headers)."""
-    for separator in ("\r\n\r\n", "\n\n"):
-        if separator in raw:
-            return json.loads(raw.split(separator, 1)[1].strip())
-    return json.loads(raw.strip())
-
-
 class LoyaltyHandler(BaseHTTPRequestHandler):
 
-    TARGET_PATH = "/pocket-bff/users/me/loyalty/status"
+    TARGET_PATH         = "/pocket-bff/users/me/loyalty/status"
+    TARGET_COUPONS_PATH = "/pocket-bff/loyalty/coupons"
 
     def do_GET(self):
+        if self.path == self.TARGET_COUPONS_PATH:
+            self._handle_get_coupons()
+            return
         if self.path != self.TARGET_PATH:
             print(f"🔴  404 {self.command} {self.path}")
             print()
@@ -72,14 +71,8 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
             print(f"📨  GET {self.path}")
             if not os.path.exists(CURRENT):
                 raise FileNotFoundError(f"current_state.json no encontrado en {CURRENT}")
-            # ── Leer estado previo ──────────────────────
-            prev_status = "—"
-            prev_action = "—"
-            if os.path.exists(CURRENT):
-                with open(CURRENT, "r", encoding="utf-8") as f:
-                    prev_data   = extract_json_body(f.read())
-                    prev_status = prev_data.get("loyaltyData", {}).get("status", "—").upper()
-                    prev_action = prev_data.get("loyaltyData", {}).get("action", "—").upper()
+
+            prev_status, prev_action = read_current_status(CURRENT)
             print(f"  ┌{'─' * 79}┐")
             print(f"  │  {'STATUS':10}  →  status = {prev_status:12} , action = {prev_action:<28} │")
             print(f"  └{'─' * 79}┘")
@@ -88,6 +81,23 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
                 body = extract_json_body(f.read())
 
             print(f"📤  Retornando current_state.json")
+            self._respond(200, body)
+            print()
+        except Exception as e:
+            print(f"❌  Error: {e}")
+            self._respond(500, {"error": str(e)})
+            print()
+
+    def _handle_get_coupons(self):
+        try:
+            print(f"📨  GET {self.path}  [suffix={COUPONS_LIST_SUFFIX}]")
+            filename = f"get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json"
+            src = os.path.join(RESPONSES_PATH, filename)
+            if not os.path.exists(src):
+                raise FileNotFoundError(f"Response file no encontrado: {filename}")
+            with open(src, "r", encoding="utf-8") as f:
+                body = extract_json_body(f.read())
+            print(f"📤  Retornando {filename}")
             self._respond(200, body)
             print()
         except Exception as e:
@@ -123,14 +133,7 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
 
             state_name, response_name = SCENARIOS[key]
 
-            # ── Leer estado previo antes de sobreescribir ──────────────────────
-            prev_status = "—"
-            prev_action = "—"
-            if os.path.exists(CURRENT):
-                with open(CURRENT, "r", encoding="utf-8") as f:
-                    prev_data   = extract_json_body(f.read())
-                    prev_status = prev_data.get("loyaltyData", {}).get("status", "—").upper()
-                    prev_action = prev_data.get("loyaltyData", {}).get("action", "—").upper()
+            prev_status, prev_action = read_current_status(CURRENT)
 
             # ── Actualizar current_state.json ──────────────────────────────────
             src_state = os.path.join(STATES_PATH, f"{state_name}.json")
