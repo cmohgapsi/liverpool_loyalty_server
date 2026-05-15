@@ -17,7 +17,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"action\": \"displayWelcomeModal\", //welcomeModalClosed enrollModalClosed unenroll displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
+              "raw": "{\n  \"action\": \"displayEnrollModal\", //welcomeModalClosed enrollModalClosed unenroll displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -390,6 +390,118 @@
               ],
               "cookie": [],
               "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": \"720100015844\",\n        \"userId\": 2465729859,\n        \"action\": \"none\",\n        \"loyaltyStatus\": \"unenrolled\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "GET Loyalty/status",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "status"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "NOT FOUND",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/statusd",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "statusd"
+                  ]
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "_postman_previewlanguage": "",
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 15 May 2026 15:34:09 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "98"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": {\n        \"status\": \"NOT FOUND: GET - /pocket-bff/users/me/loyalty/statusd\",\n        \"statusCode\": 404\n    }\n}"
             }
           ]
         }
