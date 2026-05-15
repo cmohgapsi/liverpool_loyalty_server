@@ -1,0 +1,39 @@
+HTTP/1.1 200 OK
+x-correlation-id: 66b141f0e5a34e59e4604b6ad3a50e1a
+x-app-version: 3.892.5
+server-timing: traceparent;desc="00-66b141f0e5a34e59e4604b6ad3a50e1a-870c15fb1c0067b5-00"
+traceparent: 00-66b141f0e5a34e59e4604b6ad3a50e1a-870c15fb1c0067b5-00
+x-cloud-trace-context: 66b141f0e5a34e59e4604b6ad3a50e1a/1831182701696887700;o=0
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-xss-protection: 0
+vary: Origin
+access-control-allow-credentials: true
+content-type: application/json; charset=utf-8
+x-powered-by: GH: Alpha018, Gianfranco753
+date: Mon, 11 May 2026 23:35:22 GMT
+x-envoy-upstream-service-time: 4
+server: istio-envoy
+Via: 1.1 google
+Alt-Svc: h3=":443"; ma=2592000
+
+{
+    "status": {
+        "status": "OK",
+        "statusCode": 0
+    },
+    "data": {
+        "loyaltyMemberId": null,
+        "userId": 2465729859,
+        "action": "none",
+        "loyaltyStatus": "declined"
+    }
+}
