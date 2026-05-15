@@ -20,17 +20,16 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from state_utils import extract_json_body, load_env, read_current_status
 
 # ─── Configura esta ruta ──────────────────────────────────────────────────────
-BASE_PATH      = "/Users/carlosmoh/acorde/development/gapsi/lealtad/proxyman/decommission"
+_env = load_env(os.path.join(os.path.dirname(__file__), ".env"))
+BASE_PATH      = _env.get("BASE_PATH", os.path.dirname(__file__))
 STATES_PATH    = os.path.join(BASE_PATH, "states")
 RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
 PORT           = 9876
 COUPONS_LIST_SUFFIX = "empty"  # "empty" | "full"
-# ─────────────────────────────────────────────────────────────────────────────
-
-_env = load_env(os.path.join(BASE_PATH, ".env"))
 TARGET_PATH         = _env.get("TARGET_PATH",         "/pocket-bff/users/me/loyalty/status")
 TARGET_COUPONS_PATH = _env.get("TARGET_COUPONS_PATH", "/pocket-bff/loyalty/coupons")
+# ─────────────────────────────────────────────────────────────────────────────
 
 # Mapa de escenarios: (action, value) → (state_file, response_file)
 SCENARIOS = {
