@@ -1,0 +1,399 @@
+{
+  "info": {
+    "_postman_id": "30cfb74d-6184-48a3-9cc7-5371cf341a9f",
+    "name": "LIVERPOOL-DECOMMISSION",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27403640",
+    "_collection_link": "https://go.postman.co/collection/27403640-30cfb74d-6184-48a3-9cc7-5371cf341a9f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "mock-state-server",
+      "item": [
+        {
+          "name": "SET Loyalty/status",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"displayWelcomeModal\", //welcomeModalClosed enrollModalClosed unenroll displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "status"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "SET status displayWelcomeModal",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"displayWelcomeModal\",\n  \"value\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 12 May 2026 03:04:22 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "203"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": \"720100015844\",\n        \"userId\": 2465729859,\n        \"action\": \"displayWelcomeModal\",\n        \"loyaltyStatus\": \"enrolled\",\n        \"memberSince\": \"2026-01-30\"\n    }\n}"
+            },
+            {
+              "name": "SET status displayEnrollModal",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"displayEnrollModal\",\n  \"value\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 12 May 2026 03:05:13 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "166"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": null,\n        \"userId\": 2465729859,\n        \"action\": \"displayEnrollModal\",\n        \"loyaltyStatus\": \"notEnrolled\"\n    }\n}"
+            },
+            {
+              "name": "SET status welcomeModalClosed",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"welcomeModalClosed\",\n  \"value\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 12 May 2026 03:10:41 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "188"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": \"720100015844\",\n        \"userId\": 2465729859,\n        \"action\": \"none\",\n        \"loyaltyStatus\": \"enrolled\",\n        \"memberSince\": \"2026-01-30\"\n    }\n}"
+            },
+            {
+              "name": "SET status enrollModalClosed",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"enrollModalClosed\",\n  \"value\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 12 May 2026 03:11:31 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "149"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": null,\n        \"userId\": 2465729859,\n        \"action\": \"none\",\n        \"loyaltyStatus\": \"declined\"\n    }\n}"
+            },
+            {
+              "name": "SET status unenroll",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"action\": \"unenroll\",\n  \"value\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Tue, 12 May 2026 03:12:00 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "161"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": \"720100015844\",\n        \"userId\": 2465729859,\n        \"action\": \"none\",\n        \"loyaltyStatus\": \"unenrolled\"\n    }\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
