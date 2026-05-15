@@ -1,0 +1,47 @@
+HTTP/1.1 200 OK
+x-correlation-id: ada1c8c9ed0608c1ef496c7c14140e22
+x-app-version: 3.882.0
+server-timing: traceparent;desc="00-ada1c8c9ed0608c1ef496c7c14140e22-0cd631a00a0e1dbd-00"
+traceparent: 00-ada1c8c9ed0608c1ef496c7c14140e22-0cd631a00a0e1dbd-00
+x-cloud-trace-context: ada1c8c9ed0608c1ef496c7c14140e22/5485871347906968529;o=0
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-xss-protection: 0
+vary: Origin
+access-control-allow-credentials: true
+content-type: application/json; charset=utf-8
+x-powered-by: GH: Alpha018, Gianfranco753
+date: Sun, 03 May 2026 20:09:56 GMT
+x-envoy-upstream-service-time: 4
+server: istio-envoy
+Via: 1.1 google
+Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+
+{
+  "status": {
+    "status": "OK",
+    "statusCode": 0,
+    "successMessage": "User retrieved successfully"
+  },
+  "repositoryId": "12237108594",
+  "firstName": "John",
+  "lastName": "Doe",
+  "maternalName": "Alias",
+  "gender": "male",
+  "email": "email@test.com",
+  "dateOfBirth": "12/10/1989",
+  "monederoAccNumber": 8790003681888,
+  "loyaltyData": {
+    "action": "displayWelcomeModal",
+    "status": "enrolled",
+    "memberSince": "2026-01-30"
+  }
+}
