@@ -9,7 +9,7 @@ Setup en Proxyman:
               → http://localhost:9876/pocket-bff/users/me/loyalty/status
 
 Uso:
-    python3 state_server.py
+    python3 loyalty_server.py
 """
 
 import json
