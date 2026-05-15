@@ -7,7 +7,7 @@ Atiende tres endpoints:
 | Método | Path | Descripción |
 |---|---|---|
 | `GET` | `/pocket-bff/users/me/loyalty/status` | Devuelve `current_state.json` |
-| `GET` | `/pocket-bff/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
+| `GET` | `/pocket-bff/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
 | `PATCH` | `/pocket-bff/users/me/loyalty/status` | Aplica transición de estado y devuelve el response correspondiente |
 
 ---
@@ -65,22 +65,19 @@ cp .env-example .env
 
 ```env
 BASE_PATH=/ruta/absoluta/a/decommission
+PORT=9876
 TARGET_PATH=/pocket-bff/users/me/loyalty/status
 TARGET_COUPONS_PATH=/pocket-bff/loyalty/coupons
+COUPONS_LIST_SUFFIX=empty
 ```
-
-| Variable | Descripción |
-|---|---|
-| `BASE_PATH` | Ruta absoluta a la carpeta `decommission/`. Ajústala si mueves el proyecto. |
-| `TARGET_PATH` | Path del endpoint de loyalty status (GET y PATCH). |
-| `TARGET_COUPONS_PATH` | Path del endpoint de cupones (GET). |
-
-### Variables en `loyalty_server.py`
 
 | Variable | Valores | Descripción |
 |---|---|---|
-| `PORT` | `9876` | Puerto del servidor local |
-| `COUPONS_LIST_SUFFIX` | `"empty"` · `"full"` | Controla qué archivo de cupones se sirve en el GET de cupones |
+| `BASE_PATH` | ruta absoluta | Ruta a la carpeta `decommission/`. Ajústala si mueves el proyecto. |
+| `PORT` | `9876` | Puerto del servidor local. |
+| `TARGET_PATH` | path | Endpoint de loyalty status (GET y PATCH). |
+| `TARGET_COUPONS_PATH` | path | Endpoint de cupones (GET). |
+| `COUPONS_LIST_SUFFIX` | `empty` · `full` | Controla qué archivo de cupones se sirve. |
 
 ---
 
@@ -98,9 +95,9 @@ TARGET_COUPONS_PATH=/pocket-bff/loyalty/coupons
 
 | Campo | Valor |
 |---|---|
-| Match URL | `https://<host>/pocket-bff/loyalty/coupons` |
+| Match URL | `https://<host>/pocket-bff/users/me/loyalty/coupons` |
 | Método | `GET` |
-| Redirect to | `http://localhost:9876/pocket-bff/loyalty/coupons` |
+| Redirect to | `http://localhost:9876/pocket-bff/users/me/loyalty/coupons` |
 
 ### Map Remote — PATCH de estado de lealtad
 
@@ -148,18 +145,18 @@ Devuelve el contenido actual de `states/current_state.json` e imprime en consola
 
 ---
 
-### GET `/pocket-bff/loyalty/coupons`
+### GET `/pocket-bff/users/me/loyalty/coupons`
 
 Devuelve `responses/get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json`.
 
-Para cambiar entre lista vacía y lista completa, edita la variable en `loyalty_server.py`:
+Para cambiar entre lista vacía y lista completa, edita `COUPONS_LIST_SUFFIX` en `.env` y reinicia el servidor:
 
-```python
-COUPONS_LIST_SUFFIX = "empty"  # "empty" | "full"
+```env
+COUPONS_LIST_SUFFIX=full
 ```
 
 ```
-📨  GET /pocket-bff/loyalty/coupons  [suffix=full]
+📨  GET /pocket-bff/users/me/loyalty/coupons  [suffix=full]
 📤  Retornando get_loyalty_coupons_enrolled_full.json
 ```
 
@@ -230,7 +227,7 @@ App ← estado actual de lealtad
 
 ─────────────────────────────────────────────
 
-App → GET /pocket-bff/loyalty/coupons
+App → GET /pocket-bff/users/me/loyalty/coupons
         │
         ▼
   Proxyman Map Remote → localhost:9876

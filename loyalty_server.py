@@ -22,8 +22,8 @@ BASE_PATH      = _env.get("BASE_PATH", os.path.dirname(__file__))
 STATES_PATH    = os.path.join(BASE_PATH, "states")
 RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
-PORT           = 9876
-COUPONS_LIST_SUFFIX = "empty"  # "empty" | "full"
+PORT                = int(_env.get("PORT", 9876))
+COUPONS_LIST_SUFFIX = _env.get("COUPONS_LIST_SUFFIX", "empty")
 TARGET_PATH         = _env.get("TARGET_PATH",         "/pocket-bff/users/me/loyalty/status")
 TARGET_COUPONS_PATH = _env.get("TARGET_COUPONS_PATH", "/pocket-bff/loyalty/coupons")
 # ─────────────────────────────────────────────────────────────────────────────
