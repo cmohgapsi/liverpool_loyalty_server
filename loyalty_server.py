@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 """
 Proxyman State Server — Lealtad
-Recibe el PATCH redirigido por Map Remote de Proxyman,
-actualiza current_state.json y retorna el response apropiado directamente.
-
-Setup en Proxyman:
-    Map Remote → PATCH .../pocket-bff/users/me/loyalty/status
-              → http://localhost:9876/pocket-bff/users/me/loyalty/status
+Recibe las llamadas redirigidas por Map Remote de Proxyman y delega
+en los handlers especializados de status y cupones.
 
 Uso:
     python3 loyalty_server.py
@@ -14,12 +10,13 @@ Uso:
 
 import json
 import os
-import shutil
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from state_utils import extract_json_body, load_env, read_current_status
+from state_utils import load_env
+from coupons_handler import CouponsHandlerMixin
+from status_handler import StatusHandlerMixin
 
-# ─── Configura esta ruta ──────────────────────────────────────────────────────
+# ─── Configuración ────────────────────────────────────────────────────────────
 _env = load_env(os.path.join(os.path.dirname(__file__), ".env"))
 BASE_PATH      = _env.get("BASE_PATH", os.path.dirname(__file__))
 STATES_PATH    = os.path.join(BASE_PATH, "states")
@@ -31,32 +28,8 @@ TARGET_PATH         = _env.get("TARGET_PATH",         "/pocket-bff/users/me/loya
 TARGET_COUPONS_PATH = _env.get("TARGET_COUPONS_PATH", "/pocket-bff/loyalty/coupons")
 # ─────────────────────────────────────────────────────────────────────────────
 
-# Mapa de escenarios: (action, value) → (state_file, response_file)
-SCENARIOS = {
-    ("welcomeModalClosed", True): (
-        "enrolled_none_state",
-        "path_status_enrolled"
-    ),
-    ("enrollModalClosed", True): (
-        "declined_none_state",
-        "path_status_declined"
-    ),
-    ("unenroll", True): (
-        "unenrolled_none_state",
-        "path_status_unenroll"
-    ),
-    ("displayWelcomeModal", True): (
-        "enrolled_welcome_state",
-        "path_status_enroll_welcome"
-    ),
-    ("displayEnrollModal", True): (
-        "notEnrolled_enroll_state",
-        "path_status_notEnrolled_enroll"
-    ),
-}
 
-
-class LoyaltyHandler(BaseHTTPRequestHandler):
+class LoyaltyHandler(CouponsHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -65,115 +38,28 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path == TARGET_COUPONS_PATH:
-            self._handle_get_coupons()
+            self._handle_get_coupons(RESPONSES_PATH, COUPONS_LIST_SUFFIX)
             return
         if self.path != TARGET_PATH:
-            print(f"🔴  404 {self.command} {self.path}")
-            print()
-            self._respond(404, {"status": {"status": f"NOT FOUND: {self.command} - {self.path}", "statusCode": 404}})
+            self._not_found()
             return
-        try:
-            print(f"📨  GET {self.path}")
-            if not os.path.exists(CURRENT):
-                raise FileNotFoundError(f"current_state.json no encontrado en {CURRENT}")
-
-            prev_status, prev_action = read_current_status(CURRENT)
-            print(f"  ┌{'─' * 79}┐")
-            print(f"  │  {'STATUS':10}  →  status = {prev_status:12} , action = {prev_action:<28} │")
-            print(f"  └{'─' * 79}┘")
-
-            with open(CURRENT, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
-
-            print(f"📤  Retornando current_state.json")
-            self._respond(200, body)
-            print()
-        except Exception as e:
-            print(f"❌  Error: {e}")
-            self._respond(500, {"error": str(e)})
-            print()
-
-    def _handle_get_coupons(self):
-        try:
-            print(f"📨  GET {self.path}  [suffix={COUPONS_LIST_SUFFIX}]")
-            filename = f"get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json"
-            src = os.path.join(RESPONSES_PATH, filename)
-            if not os.path.exists(src):
-                raise FileNotFoundError(f"Response file no encontrado: {filename}")
-            with open(src, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
-            print(f"📤  Retornando {filename}")
-            self._respond(200, body)
-            print()
-        except Exception as e:
-            print(f"❌  Error: {e}")
-            self._respond(500, {"error": str(e)})
-            print()
+        self._handle_get_status(CURRENT)
 
     def do_PATCH(self):
         if self.path != TARGET_PATH:
-            print(f"🔴  404 {self.command} {self.path}")
-            print()
-            self._respond(404, {"status": {"status": f"NOT FOUND: {self.command} - {self.path}", "statusCode": 404}})
+            self._not_found()
             return
-        try:
-            length = int(self.headers.get("Content-Length", 0))
-            data   = json.loads(self.rfile.read(length).decode("utf-8"))
-
-            action = data.get("action", "")
-            value  = data.get("value")
-            key    = (action, value)
-
-            print(f"📨  PATCH {self.path} → action='{action}', value={value}")
-
-            # ── Sin escenario coincidente ──────────────────────────────────────
-            if key not in SCENARIOS:
-                print("⚪  Sin escenario coincidente — retornando 200 vacío")
-                self._respond(200, {
-                    "status": {"status": "OK", "statusCode": 0,
-                               "successMessage": "No scenario matched"}
-                })
-                print()
-                return
-
-            state_name, response_name = SCENARIOS[key]
-
-            prev_status, prev_action = read_current_status(CURRENT)
-
-            # ── Actualizar current_state.json ──────────────────────────────────
-            src_state = os.path.join(STATES_PATH, f"{state_name}.json")
-            if not os.path.exists(src_state):
-                raise FileNotFoundError(f"State file no encontrado: {state_name}.json")
-
-            shutil.copy2(src_state, CURRENT)
-            print(f"✅  {state_name}.json  →  current_state.json")
-
-            # ── Leer y parsear el response file ───────────────────────────────
-            src_response = os.path.join(RESPONSES_PATH, f"{response_name}.json")
-            if not os.path.exists(src_response):
-                raise FileNotFoundError(f"Response file no encontrado: {response_name}.json")
-
-            with open(src_response, "r", encoding="utf-8") as f:
-                response_body = extract_json_body(f.read())
-
-            new_status = response_body.get("data", {}).get("loyaltyStatus", "—").upper()
-            new_action = response_body.get("data", {}).get("action", "—").upper()
-            print(f"  ┌{'─' * 85}┐")
-            print(f"  │  {'BEFORE':16}  →  status = {prev_status:12} , action = {prev_action:<28} │")
-            print(f"  │  {'PATH ACTION':16}  →  {action:<62}│")
-            print(f"  │  {'AFTER':16}  →  status = {new_status:12} , action = {new_action:<28} │")
-            print(f"  └{'─' * 85}┘")
-
-            print(f"📤  Retornando {response_name}.json")
-            self._respond(200, response_body)
-            print()
-
-        except Exception as e:
-            print(f"❌  Error: {e}")
-            self._respond(500, {"error": str(e)})
-            print()
+        self._handle_patch_status(STATES_PATH, RESPONSES_PATH, CURRENT)
 
     # ── Helpers ───────────────────────────────────────────────────────────────
+    def _not_found(self):
+        print(f"🔴  404 {self.command} {self.path}")
+        print()
+        self._respond(404, {"status": {
+            "status": f"NOT FOUND: {self.command} - {self.path}",
+            "statusCode": 404
+        }})
+
     def _send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
         self.send_header("Access-Control-Allow-Methods", "GET, PATCH, OPTIONS")
@@ -182,9 +68,9 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
     def _respond(self, code, payload):
         body = json.dumps(payload).encode("utf-8")
         self.send_response(code)
-        self.send_header("Content-Type",   "application/json; charset=utf-8")
-        self.send_header("Content-Length", str(len(body)))
-        self.send_header("x-correlation-id",       "66b141f0e5a34e59e4604b6ad3a50e1a")
+        self.send_header("Content-Type",            "application/json; charset=utf-8")
+        self.send_header("Content-Length",          str(len(body)))
+        self.send_header("x-correlation-id",        "66b141f0e5a34e59e4604b6ad3a50e1a")
         self.send_header("x-app-version",           "3.892.5")
         self.send_header("x-content-type-options",  "nosniff")
         self._send_cors_headers()

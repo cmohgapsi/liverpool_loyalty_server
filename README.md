@@ -16,6 +16,9 @@ Atiende tres endpoints:
 
 ```
 decommission/
+├── documentation/
+│   ├── LIVERPOOL-DECOMMISSION.postman_collection.json  ← Colección Postman con los endpoints
+│   └── LoyaltyStatus.png                               ← Diagrama de estados de lealtad
 ├── states/
 │   ├── current_state.json              ← Estado actual (leído por el GET de status)
 │   ├── enrolled_welcome_state.json
@@ -31,8 +34,12 @@ decommission/
 │   ├── path_status_unenroll.json
 │   ├── get_loyalty_coupons_enrolled_empty.json
 │   └── get_loyalty_coupons_enrolled_full.json
-├── loyalty_server.py                   ← Servidor local
-├── state_utils.py                      ← Utilidades compartidas de estado
+├── .env                                ← Rutas configurables (no versionado, créalo desde .env-example)
+├── .env-example                        ← Plantilla de variables de entorno
+├── loyalty_server.py                   ← Servidor local: routing y configuración
+├── coupons_handler.py                  ← Handler y lógica de cupones (CouponsHandlerMixin)
+├── status_handler.py                   ← Handler y lógica de status (StatusHandlerMixin, SCENARIOS)
+├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, read_current_status)
 └── README.md
 ```
 
@@ -42,19 +49,38 @@ decommission/
 
 - macOS con **Proxyman** instalado
 - **Python 3** (incluido en macOS por defecto)
-- La carpeta copiada en tu máquina (ajusta `BASE_PATH` en `loyalty_server.py` si la mueves)
+- Sin dependencias externas — solo librería estándar
 
 ---
 
 ## Configuración
 
-### Variables globales en `loyalty_server.py`
+### `.env`
+
+Copia `.env-example` y ajusta `BASE_PATH` a tu máquina:
+
+```bash
+cp .env-example .env
+```
+
+```env
+BASE_PATH=/ruta/absoluta/a/decommission
+TARGET_PATH=/pocket-bff/users/me/loyalty/status
+TARGET_COUPONS_PATH=/pocket-bff/loyalty/coupons
+```
+
+| Variable | Descripción |
+|---|---|
+| `BASE_PATH` | Ruta absoluta a la carpeta `decommission/`. Ajústala si mueves el proyecto. |
+| `TARGET_PATH` | Path del endpoint de loyalty status (GET y PATCH). |
+| `TARGET_COUPONS_PATH` | Path del endpoint de cupones (GET). |
+
+### Variables en `loyalty_server.py`
 
 | Variable | Valores | Descripción |
 |---|---|---|
-| `BASE_PATH` | ruta absoluta | Directorio raíz de la carpeta `decommission/` |
 | `PORT` | `9876` | Puerto del servidor local |
-| `COUPONS_LIST_SUFFIX` | `"empty"` · `"full"` | Controla qué archivo de cupones se sirve en el GET `/loyalty/coupons` |
+| `COUPONS_LIST_SUFFIX` | `"empty"` · `"full"` | Controla qué archivo de cupones se sirve en el GET de cupones |
 
 ---
 
@@ -98,6 +124,8 @@ Salida esperada:
 🚀  Loyalty server corriendo en http://localhost:9876
 📁  States:    …/states
 📁  Responses: …/responses
+🌐  TARGET_PATH         = /pocket-bff/users/me/loyalty/status
+🌐  TARGET_COUPONS_PATH = /pocket-bff/loyalty/coupons
 ```
 
 > Mantén esta terminal abierta durante toda la sesión de prueba.
