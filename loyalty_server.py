@@ -60,6 +60,39 @@ def extract_json_body(raw: str) -> dict:
 
 class LoyaltyHandler(BaseHTTPRequestHandler):
 
+    TARGET_PATH = "/pocket-bff/users/me/loyalty/status"
+
+    def do_GET(self):
+        if self.path != self.TARGET_PATH:
+            self._respond(404, {"error": "Not found"})
+            return
+        try:
+            print(f"📨  GET {self.path}")
+            if not os.path.exists(CURRENT):
+                raise FileNotFoundError(f"current_state.json no encontrado en {CURRENT}")
+            # ── Leer estado previo ──────────────────────
+            prev_status = "—"
+            prev_action = "—"
+            if os.path.exists(CURRENT):
+                with open(CURRENT, "r", encoding="utf-8") as f:
+                    prev_data   = extract_json_body(f.read())
+                    prev_status = prev_data.get("loyaltyData", {}).get("status", "—").upper()
+                    prev_action = prev_data.get("loyaltyData", {}).get("action", "—").upper()
+            print(f"  ┌{'─' * 79}┐")
+            print(f"  │  {'STATUS':10}  →  status = {prev_status:12} , action = {prev_action:<28} │")
+            print(f"  └{'─' * 79}┘")
+
+            with open(CURRENT, "r", encoding="utf-8") as f:
+                body = extract_json_body(f.read())
+
+            print(f"📤  Retornando current_state.json")
+            self._respond(200, body)
+            print()
+        except Exception as e:
+            print(f"❌  Error: {e}")
+            self._respond(500, {"error": str(e)})
+            print()
+
     def do_PATCH(self):
         try:
             length = int(self.headers.get("Content-Length", 0))
@@ -85,6 +118,7 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
 
             # ── Leer estado previo antes de sobreescribir ──────────────────────
             prev_status = "—"
+            prev_action = "—"
             if os.path.exists(CURRENT):
                 with open(CURRENT, "r", encoding="utf-8") as f:
                     prev_data   = extract_json_body(f.read())
@@ -107,9 +141,6 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
             with open(src_response, "r", encoding="utf-8") as f:
                 response_body = extract_json_body(f.read())
 
-            print(f"📤  Retornando {response_name}.json")
-            self._respond(200, response_body)
-
             new_status = response_body.get("data", {}).get("loyaltyStatus", "—").upper()
             new_action = response_body.get("data", {}).get("action", "—").upper()
             print(f"  ┌{'─' * 85}┐")
@@ -117,6 +148,9 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
             print(f"  │  {'PATH ACTION':16}  →  {action:<62}│")
             print(f"  │  {'AFTER':16}  →  status = {new_status:12} , action = {new_action:<28} │")
             print(f"  └{'─' * 85}┘")
+
+            print(f"📤  Retornando {response_name}.json")
+            self._respond(200, response_body)
             print()
 
         except Exception as e:
