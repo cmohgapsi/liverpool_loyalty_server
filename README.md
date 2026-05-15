@@ -21,7 +21,7 @@ proxyman-loyalty/
 │   ├── path_status_enrolled.json
 │   ├── path_status_declined.json
 │   └── path_status_unenroll.json
-├── state_server.py                     ← Servidor local (único archivo necesario)
+├── loyalty_server.py                     ← Servidor local (único archivo necesario)
 └── README.md
 ```
 
@@ -31,7 +31,7 @@ proxyman-loyalty/
 
 - macOS con **Proxyman** instalado
 - **Python 3** (incluido en macOS por defecto)
-- La carpeta copiada en tu máquina (ajusta `BASE_PATH` en `state_server.py` si la mueves)
+- La carpeta copiada en tu máquina (ajusta `BASE_PATH` en `loyalty_server.py` si la mueves)
 
 ---
 
@@ -65,7 +65,7 @@ Redirige el PATCH directamente al servidor local. No se necesita ningún Script.
 Abre una terminal y deja corriendo:
 
 ```bash
-python3 /ruta/a/decommission/state_server.py
+python3 /ruta/a/decommission/loyalty_server.py
 ```
 
 Deberías ver:
@@ -174,7 +174,7 @@ App → PATCH /loyalty/status
   redirige a localhost:9876
         │
         ▼
-  state_server.py
+  loyalty_server.py
         ├─ Lee action + value del body
         ├─ Busca en SCENARIOS
         ├─ Copia state_X.json → current_state.json
