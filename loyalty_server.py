@@ -64,7 +64,9 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if self.path != self.TARGET_PATH:
-            self._respond(404, {"error": "Not found"})
+            print(f"🔴  404 {self.command} {self.path}")
+            print()
+            self._respond(404, {"status": {"status": f"NOT FOUND: {self.command} - {self.path}", "statusCode": 404}})
             return
         try:
             print(f"📨  GET {self.path}")
@@ -94,6 +96,11 @@ class LoyaltyHandler(BaseHTTPRequestHandler):
             print()
 
     def do_PATCH(self):
+        if self.path != self.TARGET_PATH:
+            print(f"🔴  404 {self.command} {self.path}")
+            print()
+            self._respond(404, {"status": {"status": f"NOT FOUND: {self.command} - {self.path}", "statusCode": 404}})
+            return
         try:
             length = int(self.headers.get("Content-Length", 0))
             data   = json.loads(self.rfile.read(length).decode("utf-8"))
