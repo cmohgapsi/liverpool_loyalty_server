@@ -8,16 +8,16 @@
   },
   "item": [
     {
-      "name": "mock-state-server",
+      "name": "mock-loyalty-server",
       "item": [
         {
-          "name": "SET Loyalty/status",
+          "name": "SET loyalty/status",
           "request": {
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"action\": \"displayEnrollModal\", //welcomeModalClosed enrollModalClosed unenroll displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
+              "raw": "{\n  \"action\": \"displayEnrollModal\", //welcomeModalClosed enrollModalClosed displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -320,9 +320,42 @@
               ],
               "cookie": [],
               "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": null,\n        \"userId\": 2465729859,\n        \"action\": \"none\",\n        \"loyaltyStatus\": \"declined\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "SET loyalty/status unenroll",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"unenroll\",\n  \"value\": true,\n  \"cancelReason\":\"No me interesó el programa\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
             },
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "status"
+              ]
+            }
+          },
+          "response": [
             {
-              "name": "SET status unenroll",
+              "name": "ERROR cancelReason do not received",
               "originalRequest": {
                 "method": "PATCH",
                 "header": [],
@@ -351,8 +384,8 @@
                   ]
                 }
               },
-              "status": "OK",
-              "code": 200,
+              "status": "Bad Request",
+              "code": 400,
               "_postman_previewlanguage": null,
               "header": [
                 {
@@ -361,7 +394,7 @@
                 },
                 {
                   "key": "Date",
-                  "value": "Tue, 12 May 2026 03:12:00 GMT"
+                  "value": "Mon, 18 May 2026 17:52:45 GMT"
                 },
                 {
                   "key": "Content-Type",
@@ -369,7 +402,7 @@
                 },
                 {
                   "key": "Content-Length",
-                  "value": "161"
+                  "value": "100"
                 },
                 {
                   "key": "x-correlation-id",
@@ -386,15 +419,23 @@
                 {
                   "key": "Access-Control-Allow-Origin",
                   "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, POST, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
                 }
               ],
               "cookie": [],
-              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": {\n        \"loyaltyMemberId\": \"720100015844\",\n        \"userId\": 2465729859,\n        \"action\": \"none\",\n        \"loyaltyStatus\": \"unenrolled\"\n    }\n}"
+              "body": "{\n    \"status\": {\n        \"status\": \"ERROR\",\n        \"statusCode\": 400,\n        \"successMessage\": \"cancelReason do not received\"\n    }\n}"
             }
           ]
         },
         {
-          "name": "GET Loyalty/status",
+          "name": "loyalty/status",
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -502,6 +543,633 @@
                 }
               ],
               "body": "{\n    \"status\": {\n        \"status\": \"NOT FOUND: GET - /pocket-bff/users/me/loyalty/statusd\",\n        \"statusCode\": 404\n    }\n}"
+            },
+            {
+              "name": "Not Enrrolled",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "status"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 15 May 2026 20:06:05 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "374"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0,\n        \"successMessage\": \"User retrieved successfully\"\n    },\n    \"repositoryId\": \"12237108594\",\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"maternalName\": \"Alias\",\n    \"gender\": \"male\",\n    \"email\": \"email@test.com\",\n    \"dateOfBirth\": \"12/10/1989\",\n    \"monederoAccNumber\": 8790003681888,\n    \"loyaltyData\": {\n        \"action\": \"displayEnrollModal\",\n        \"status\": \"notEnrolled\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "loyalty/coupons",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/coupons",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "coupons"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK FULL",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/coupons",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "coupons"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "",
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 15 May 2026 21:05:59 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "6863"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"globalCoupons\": [],\n    \"userCoupons\": [],\n    \"loyaltyCoupons\": [\n        {\n            \"offerId\": \"1074396820\",\n            \"description\": \"10% de descuento\",\n            \"startDate\": \"2026-04-08T13:18:00-06:00\",\n            \"endDate\": \"2026-04-30T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": null,\n            \"offerType\": \"deal\",\n            \"offerName\": \"Prueba 1 campaña nueva\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": false,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"107439682072010001584430042026\",\n            \"couponId\": \"1074396820\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"yellow\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Descuento\"\n        },\n        {\n            \"offerId\": \"1249976832\",\n            \"description\": \"40% MONEDERO + 20 MSI DILISA / 18 MSI EXTERNAS\",\n            \"startDate\": \"2026-01-29T06:49:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMO  %MONEDERO + MSI PERMANENTE\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"124997683272010001584431122035\",\n            \"couponId\": \"1249976832\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Monedero y MSI\"\n        },\n        {\n            \"offerId\": \"1019844411\",\n            \"description\": \"35% DE DESCUENTO + PAGUE EN JULIO\",\n            \"startDate\": \"2026-01-29T06:30:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMO PERMANENTE DESCUENTO % + PAGO DIFERIDO\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"101984441172010001584431122035\",\n            \"couponId\": \"1019844411\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Descuento\"\n        },\n        {\n            \"offerId\": \"0374376544\",\n            \"description\": \"10% DE DESCUENTO ADICIONAL\",\n            \"startDate\": \"2026-01-29T06:17:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMO DESCUENTO ADICIONAL % PERMANENTE\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": true,\n            \"couponBarcode\": \"037437654472010001584431122035\",\n            \"couponId\": \"0374376544\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Monedero adicional\"\n        },\n        {\n            \"offerId\": \"0530371343\",\n            \"description\": \"2X1\",\n            \"startDate\": \"2026-01-29T06:00:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMOCIÓN PERMANENTE COMBO 2X1\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"053037134372010001584431122035\",\n            \"couponId\": \"0530371343\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Combo\"\n        },\n        {\n            \"offerId\": \"2122327085\",\n            \"description\": \"20% DE DESCUENTO + 10% ADICIONAL MONEDERO.\",\n            \"startDate\": \"2026-01-29T05:38:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMOCION  DESCUENTO% + MONEDERO% PERMANENTE\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"212232708572010001584431122035\",\n            \"couponId\": \"2122327085\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Descuento\"\n        },\n        {\n            \"offerId\": \"0592145783\",\n            \"description\": \"10% EN MONEDERO\",\n            \"startDate\": \"2026-01-28T06:00:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMOCION PERMANENTE % MONEDERO ADICIONAL\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": true,\n            \"couponBarcode\": \"059214578372010001584431122035\",\n            \"couponId\": \"0592145783\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Monedero adicional\"\n        },\n        {\n            \"offerId\": \"1757631308\",\n            \"description\": \"30% EN MONEDERO\",\n            \"startDate\": \"2026-01-28T06:00:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMO PERMANENTE MONEDERO ELECTRONICO\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": true,\n            \"couponBarcode\": \"175763130872010001584431122035\",\n            \"couponId\": \"1757631308\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Monedero\"\n        },\n        {\n            \"offerId\": \"1142523959\",\n            \"description\": \"2X1\",\n            \"startDate\": \"2026-01-28T06:00:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMOCIÓN PERMANENTE COMBO\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"114252395972010001584431122035\",\n            \"couponId\": \"1142523959\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Combo\"\n        },\n        {\n            \"offerId\": \"1563004821\",\n            \"description\": \"10% DE DESCUENTO ADICIONAL\",\n            \"startDate\": \"2026-01-28T06:00:00-06:00\",\n            \"endDate\": \"2035-12-31T23:59:00-06:00\",\n            \"desktopImage\": null,\n            \"mobileImage\": null,\n            \"campaignId\": \"87\",\n            \"offerType\": \"deal\",\n            \"offerName\": \"PROMOCION PERMANENTE DESCUENTO ADICIONAL\",\n            \"locationChannel\": \"Válido para todos los canales\",\n            \"termAndCondition\": \"\",\n            \"isGlobalCoupon\": true,\n            \"isWalletDiscount\": false,\n            \"couponBarcode\": \"156300482172010001584431122035\",\n            \"couponId\": \"1563004821\",\n            \"dealCode\": null,\n            \"loyaltyMemberId\": \"720100015844\",\n            \"couponType\": \"DEAL\",\n            \"displayColor\": \"green\",\n            \"displayUseCoupon\": true,\n            \"claimedStatus\": true,\n            \"hofferType\": \"Descuento adicional\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "loyalty/coupons/redeemed",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/coupons/redeemed",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "coupons",
+                "redeemed"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "200 OK FULL",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/coupons/redeemed",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "coupons",
+                    "redeemed"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Fri, 15 May 2026 21:08:27 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "388"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"data\": [\n        {\n            \"campaignId\": \"CMP-2026-0001\",\n            \"offerType\": \"DISCOUNT\",\n            \"usedDate\": \"05 mar 2026 - 17:27 p.m.\",\n            \"promotionName\": \"20% OFF en Electrónica\",\n            \"appliedChannel\": \"WEB\"\n        },\n        {\n            \"campaignId\": \"CMP-2026-0002\",\n            \"offerType\": \"CASHBACK\",\n            \"usedDate\": \"03 feb 2026 - 17:27 p.m.\",\n            \"promotionName\": \"Cashback Primavera\",\n            \"appliedChannel\": \"APP\"\n        }\n    ]\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST loyalty/enroll",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie-web}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"Carlos\",\r\n  \"lastName\": \"Moh\",\r\n  \"motherLastName\": \"Lugo\",\r\n  \"gender\": \"M\",\r\n  \"dateOfBirth\": \"01/01/1990\"\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/enroll",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "enroll"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "ERROR 409",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "{{cookie-web}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n  \"firstName\": \"Jesus\",\r\n  \"lastName\": \"Guzman\",\r\n  \"motherLastName\": \"Mondragon\",\r\n  \"gender\": \"M\",\r\n  \"dateOfBirth\": \"01/01/1990\"\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/enroll",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "enroll"
+                  ]
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 18 May 2026 15:00:22 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "118"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, POST, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"ERROR\",\n        \"statusCode\": 409,\n        \"successMessage\": \"invalid operation, current membership enrolled\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "POST loyalty/enroll - REENROLL",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "{{cookie-web}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n}\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/enroll",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "users",
+                "me",
+                "loyalty",
+                "enroll"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "ERROR INVALID DATA",
+              "originalRequest": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cookie",
+                    "value": "{{cookie-web}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n}\r\n",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/enroll",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "9876",
+                  "path": [
+                    "pocket-bff",
+                    "users",
+                    "me",
+                    "loyalty",
+                    "enroll"
+                  ]
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "_postman_previewlanguage": null,
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 18 May 2026 14:56:40 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "96"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, POST, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n    \"status\": {\n        \"status\": \"ERROR\",\n        \"statusCode\": 400,\n        \"successMessage\": \"Update data not received\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "checkout/coupons",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-brand-id",
+                "value": "LP"
+              },
+              {
+                "key": "Cookie",
+                "value": "{{cookie-web}}"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/checkout/coupons?isBuyNow=false",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "checkout",
+                "coupons"
+              ],
+              "query": [
+                {
+                  "key": "isBuyNow",
+                  "value": "false"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "loyalty/cancel-reasons",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:9876/pocket-bff/loyalty/cancel-reasons",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "9876",
+              "path": [
+                "pocket-bff",
+                "loyalty",
+                "cancel-reasons"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "cancelReasons",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{POCKET_URL}}/loyalty/cancel-reasons",
+                  "host": [
+                    "{{POCKET_URL}}"
+                  ],
+                  "path": [
+                    "loyalty",
+                    "cancel-reasons"
+                  ]
+                }
+              },
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json",
+                  "description": "",
+                  "type": "text"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\r\n    \"status\": {\r\n        \"status\": \"OK\",\r\n        \"statusCode\": 0\r\n    },\r\n    \"cancelReasons\": [\r\n        \"No me intersó el programa\",\r\n        \"Otro\",\r\n        \"No hay ofertas\"\r\n    ]\r\n}"
             }
           ]
         }
