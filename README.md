@@ -26,6 +26,7 @@ Atiende once endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE
 decommission/
 ├── client/
 │   ├── index.html                          ← Cliente web (abrir en browser con el servidor corriendo)
+│   ├── index.css                           ← Estilos del cliente
 │   ├── index.js                            ← Lógica del cliente
 │   └── README.md                           ← Documentación del cliente → ver client/README.md
 ├── documentation/

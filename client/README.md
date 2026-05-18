@@ -107,7 +107,8 @@ Tras la respuesta exitosa del servidor:
 
 | Archivo | Descripción |
 |---|---|
-| `index.html` | Estructura, estilos CSS y markup del panel |
+| `index.html` | Estructura y markup del panel |
+| `index.css` | Estilos: variables, layout, cards, panel, badges |
 | `index.js` | Lógica: fetch, render, dirty-state, panel toggle |
 
 ---
