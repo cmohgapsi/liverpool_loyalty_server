@@ -44,7 +44,7 @@ decommission/
 ├── coupons_handler.py                  ← Handler y lógica de cupones (CouponsHandlerMixin)
 ├── enroll_handler.py                   ← Handler y lógica de enrolamiento (EnrollHandlerMixin)
 ├── status_handler.py                   ← Handler y lógica de status (StatusHandlerMixin, SCENARIOS)
-├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, read_current_status)
+├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, read_current_status, print_operation_result)
 └── README.md
 ```
 
@@ -227,6 +227,16 @@ Tras el enroll exitoso, `current_state.json` se actualiza con:
 - `loyaltyData.status = enrolled`
 - `loyaltyData.memberSince = yyyy-mm-dd`
 
+```
+📨  POST /pocket-bff/users/me/loyalty/enroll  [loyaltyStatus=notEnrolled]
+✅  current_state.json actualizado → enrolled / displayWelcomeModal
+  ┌─────────────────────────────────────────────────────────────────────────────────────────┐
+  │  BEFORE            →  status = NOTENROLLED  , action = DISPLAYENROLLMODAL              │
+  │  ENROLL ACTION     →  enroll                                                           │
+  │  AFTER             →  status = ENROLLED     , action = DISPLAYWELCOMEMODAL             │
+  └─────────────────────────────────────────────────────────────────────────────────────────┘
+```
+
 #### Caso: `loyaltyStatus = unenrolled`
 
 Valida que el body esté vacío `{}`, actualiza `current_state.json` y retorna 200.
@@ -234,6 +244,16 @@ Valida que el body esté vacío `{}`, actualiza `current_state.json` y retorna 2
 **Body requerido:** `{}` (vacío)
 
 **Response 200:** misma estructura que el caso anterior.
+
+```
+📨  POST /pocket-bff/users/me/loyalty/enroll  [loyaltyStatus=unenrolled]
+✅  current_state.json actualizado → enrolled / displayWelcomeModal
+  ┌─────────────────────────────────────────────────────────────────────────────────────────┐
+  │  BEFORE            →  status = UNENROLLED   , action = NONE                            │
+  │  ENROLL ACTION     →  reenroll                                                         │
+  │  AFTER             →  status = ENROLLED     , action = DISPLAYWELCOMEMODAL             │
+  └─────────────────────────────────────────────────────────────────────────────────────────┘
+```
 
 **Response 400** (body no vacío):
 ```json
@@ -279,7 +299,7 @@ Si el `action` no coincide con ningún escenario, el servidor responde `200` con
 ✅  enrolled_none_state.json  →  current_state.json
   ┌─────────────────────────────────────────────────────────────────────────────────────────┐
   │  BEFORE            →  status = NOT_ENROLLED , action = DISPLAYENROLLMODAL              │
-  │  PATH ACTION       →  welcomeModalClosed                                               │
+  │  STATUS ACTION     →  welcomeModalClosed                                               │
   │  AFTER             →  status = ENROLLED     , action = NONE                            │
   └─────────────────────────────────────────────────────────────────────────────────────────┘
 📤  Retornando path_status_enrolled.json
