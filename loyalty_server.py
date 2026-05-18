@@ -34,6 +34,7 @@ LOYALTY_MEMBER_ID            = _env.get("LOYALTY_MEMBER_ID",            "7201000
 USER_ID                      = int(_env.get("USER_ID",                   2465729859))
 TARGET_CHECKOUT_COUPONS_PATH = _env.get("TARGET_CHECKOUT_COUPONS_PATH",  "/pocket-bff/checkout/coupons")
 CHECKOUT_COUPONS_SUFFIX      = _env.get("CHECKOUT_COUPONS_SUFFIX",       "cart")
+TARGET_CANCEL_REASONS_PATH   = _env.get("TARGET_CANCEL_REASONS_PATH",    "/pocket-bff/loyalty/cancel-reasons")
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -54,6 +55,9 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
             return
         if path == TARGET_CHECKOUT_COUPONS_PATH:
             self._handle_get_checkout_coupons(RESPONSES_PATH, CHECKOUT_COUPONS_SUFFIX)
+            return
+        if path == TARGET_CANCEL_REASONS_PATH:
+            self._handle_get_cancel_reasons(RESPONSES_PATH)
             return
         if path != TARGET_PATH:
             self._not_found()
@@ -112,6 +116,7 @@ if __name__ == "__main__":
     print(f"🌐  GET  {TARGET_COUPONS_PATH}  [suffix={COUPONS_LIST_SUFFIX}]")
     print(f"🌐  GET  {TARGET_REDEEMED_PATH}  [suffix={COUPONS_REDEEMED_SUFFIX}]")
     print(f"🌐  GET  {TARGET_CHECKOUT_COUPONS_PATH}?isBuyNow=<bool>  [suffix={CHECKOUT_COUPONS_SUFFIX}]")
+    print(f"🌐  GET  {TARGET_CANCEL_REASONS_PATH}")
     print(f"🌐  POST  {TARGET_ENROLL_PATH}")
     print(f"🌐  PATCH {TARGET_PATH}")
     print(f"     Configura en Proxyman: Map Remote")

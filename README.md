@@ -2,7 +2,7 @@
 
 Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
 
-Atiende cinco endpoints:
+Atiende seis endpoints:
 
 | Método | Path | Descripción |
 |---|---|---|
@@ -10,6 +10,7 @@ Atiende cinco endpoints:
 | `GET` | `/pocket-bff/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
 | `GET` | `/pocket-bff/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
 | `GET` | `/pocket-bff/checkout/coupons?isBuyNow=<bool>` | Devuelve cupones de checkout según `CHECKOUT_COUPONS_SUFFIX` |
+| `GET` | `/pocket-bff/loyalty/cancel-reasons` | Devuelve `get_loyalty_cancel_reasons.json` |
 | `POST` | `/pocket-bff/users/me/loyalty/enroll` | Enrola o re-enrola al usuario según su estado actual |
 | `PATCH` | `/pocket-bff/users/me/loyalty/status` | Aplica transición de estado y devuelve el response correspondiente |
 
@@ -40,7 +41,8 @@ decommission/
 │   ├── get_loyalty_coupons_redeemed_empty.json
 │   ├── get_loyalty_coupons_redeemed_full.json
 │   ├── get_checkout_coupons_cart.json
-│   └── get_checkout_coupons_no_cart_error.json
+│   ├── get_checkout_coupons_no_cart_error.json
+│   └── get_loyalty_cancel_reasons.json
 ├── .env                                ← Variables de entorno (no versionado, créalo desde .env-example)
 ├── .env-example                        ← Plantilla de variables de entorno
 ├── loyalty_server.py                   ← Servidor local: routing y configuración
@@ -98,6 +100,7 @@ USER_ID=2465729859
 | `USER_ID` | número | ID de usuario retornado en el response de enroll. |
 | `TARGET_CHECKOUT_COUPONS_PATH` | path | Endpoint de cupones de checkout (GET). |
 | `CHECKOUT_COUPONS_SUFFIX` | `cart` · `no_cart_error` | Archivo de cupones de checkout a servir. |
+| `TARGET_CANCEL_REASONS_PATH` | path | Endpoint de razones de cancelación (GET). |
 
 ---
 
@@ -119,6 +122,14 @@ USER_ID=2465729859
 | Método | `GET` |
 | Redirect to | `http://localhost:9876/pocket-bff/checkout/coupons` |
 
+### Map Remote — Cancel reasons
+
+| Campo | Valor |
+|---|---|
+| Match URL | `https://<host>/pocket-bff/loyalty/cancel-reasons` |
+| Método | `GET` |
+| Redirect to | `http://localhost:9876/pocket-bff/loyalty/cancel-reasons` |
+
 ---
 
 ## Cómo ejecutar
@@ -137,6 +148,7 @@ Salida esperada:
 🌐  GET  /pocket-bff/users/me/loyalty/coupons  [suffix=full]
 🌐  GET  /pocket-bff/users/me/loyalty/coupons/redeemed  [suffix=empty]
 🌐  GET  /pocket-bff/checkout/coupons?isBuyNow=<bool>  [suffix=cart]
+🌐  GET  /pocket-bff/loyalty/cancel-reasons
 🌐  POST  /pocket-bff/users/me/loyalty/enroll
 🌐  PATCH /pocket-bff/users/me/loyalty/status
 ```
@@ -217,6 +229,17 @@ CHECKOUT_COUPONS_SUFFIX=no_cart_error
 ```
 📨  GET /pocket-bff/checkout/coupons?isBuyNow=false  [isBuyNow=false]  [suffix=cart]
 📤  Retornando get_checkout_coupons_cart.json
+```
+
+---
+
+### GET `/pocket-bff/loyalty/cancel-reasons`
+
+Devuelve el contenido de `responses/get_loyalty_cancel_reasons.json` sin ningún parámetro adicional.
+
+```
+📨  GET /pocket-bff/loyalty/cancel-reasons
+📤  Retornando get_loyalty_cancel_reasons.json
 ```
 
 ---
@@ -416,6 +439,20 @@ App → GET /pocket-bff/checkout/coupons?isBuyNow=false
         │
         ▼
 App ← cupones de checkout (cart | no_cart_error)
+
+─────────────────────────────────────────────
+
+App → GET /pocket-bff/loyalty/cancel-reasons
+        │
+        ▼
+  Proxyman Map Remote → localhost:9876
+        │
+        ▼
+  loyalty_server.py → status_handler.py
+        └─ Lee get_loyalty_cancel_reasons.json
+        │
+        ▼
+App ← lista de razones de cancelación
 
 ─────────────────────────────────────────────
 

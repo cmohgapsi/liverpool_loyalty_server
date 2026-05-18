@@ -53,6 +53,23 @@ class StatusHandlerMixin:
             self._respond(500, {"error": str(e)})
             print()
 
+    def _handle_get_cancel_reasons(self, responses_path: str):
+        try:
+            print(f"📨  GET {self.path}")
+            filename = "get_loyalty_cancel_reasons.json"
+            src = os.path.join(responses_path, filename)
+            if not os.path.exists(src):
+                raise FileNotFoundError(f"Response file no encontrado: {filename}")
+            with open(src, "r", encoding="utf-8") as f:
+                body = extract_json_body(f.read())
+            print(f"📤  Retornando {filename}")
+            self._respond(200, body)
+            print()
+        except Exception as e:
+            print(f"❌  Error: {e}")
+            self._respond(500, {"error": str(e)})
+            print()
+
     def _handle_patch_status(self, states_path: str, responses_path: str, current: str):
         try:
             length = int(self.headers.get("Content-Length", 0))
