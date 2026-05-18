@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 
-from state_utils import extract_json_body, read_current_status
+from state_utils import extract_json_body, print_operation_result, read_current_status
 
 
 SCENARIOS = {
@@ -92,11 +92,7 @@ class StatusHandlerMixin:
 
             new_status = response_body.get("data", {}).get("loyaltyStatus", "—").upper()
             new_action = response_body.get("data", {}).get("action", "—").upper()
-            print(f"  ┌{'─' * 85}┐")
-            print(f"  │  {'BEFORE':16}  →  status = {prev_status:12} , action = {prev_action:<28} │")
-            print(f"  │  {'PATH ACTION':16}  →  {action:<62}│")
-            print(f"  │  {'AFTER':16}  →  status = {new_status:12} , action = {new_action:<28} │")
-            print(f"  └{'─' * 85}┘")
+            print_operation_result(prev_status, prev_action, "STATUS", action, new_status, new_action)
 
             print(f"📤  Retornando {response_name}.json")
             self._respond(200, response_body)

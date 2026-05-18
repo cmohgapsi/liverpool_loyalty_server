@@ -25,6 +25,16 @@ def extract_json_body(raw: str) -> dict:
     return json.loads(raw.strip())
 
 
+def print_operation_result(prev_status: str, prev_action: str,
+                           operation: str, action: str,
+                           new_status: str, new_action: str):
+    print(f"  ┌{'─' * 85}┐")
+    print(f"  │  {'BEFORE':16}  →  status = {prev_status:12} , action = {prev_action:<28} │")
+    print(f"  │  {(operation + ' ACTION'):16}  →  {action:<62}│")
+    print(f"  │  {'AFTER':16}  →  status = {new_status:12} , action = {new_action:<28} │")
+    print(f"  └{'─' * 85}┘")
+
+
 def read_current_status(current_path: str) -> tuple[str, str]:
     """Lee status y action del current_state.json. Retorna ('—', '—') si no existe."""
     if not os.path.exists(current_path):

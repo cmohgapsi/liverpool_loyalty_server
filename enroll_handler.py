@@ -2,7 +2,7 @@ import json
 import os
 from datetime import date
 
-from state_utils import extract_json_body
+from state_utils import extract_json_body, print_operation_result, read_current_status
 
 ENROLL_REQUIRED_FIELDS = {"firstName", "lastName", "motherLastName", "gender", "dateOfBirth"}
 
@@ -59,8 +59,10 @@ class EnrollHandlerMixin:
             print()
             return
 
+        prev_status, prev_action = read_current_status(current)
         _update_current_state(current, body)
         print(f"✅  current_state.json actualizado → enrolled / displayWelcomeModal")
+        print_operation_result(prev_status, prev_action, "ENROLL", "enroll", "ENROLLED", "DISPLAYWELCOMEMODAL")
 
         self._respond(200, {
             "status": {"status": "OK", "statusCode": 0},
@@ -80,8 +82,10 @@ class EnrollHandlerMixin:
             print()
             return
 
+        prev_status, prev_action = read_current_status(current)
         _update_loyalty_data(current)
         print(f"✅  current_state.json actualizado → enrolled / displayWelcomeModal")
+        print_operation_result(prev_status, prev_action, "ENROLL", "reenroll", "ENROLLED", "DISPLAYWELCOMEMODAL")
 
         self._respond(200, {
             "status": {"status": "OK", "statusCode": 0},

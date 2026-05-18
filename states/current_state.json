@@ -32,12 +32,12 @@ Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     "successMessage": "User retrieved successfully"
   },
   "repositoryId": "12237108594",
-  "firstName": "John",
-  "lastName": "Doe",
-  "maternalName": "Alias",
+  "firstName": "Carlos",
+  "lastName": "Moh",
+  "maternalName": "Lugo",
   "gender": "male",
   "email": "email@test.com",
-  "dateOfBirth": "12/10/1989",
+  "dateOfBirth": "01/01/1990",
   "monederoAccNumber": 8790003681888,
   "loyaltyData": {
     "action": "displayWelcomeModal",
