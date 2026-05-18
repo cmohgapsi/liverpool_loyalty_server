@@ -35,6 +35,19 @@ def print_operation_result(prev_status: str, prev_action: str,
     print(f"  └{'─' * 85}┘")
 
 
+def resolve_response_file(responses_path: str, url_path: str, filename: str) -> str:
+    """Resuelve la ruta del archivo de respuesta.
+
+    Busca primero en responses/<primer-segmento-del-path>/<filename>.
+    Si no existe, retorna responses/<filename> como fallback.
+    """
+    first_segment = url_path.strip("/").split("/")[0]
+    override = os.path.join(responses_path, first_segment, filename)
+    if os.path.exists(override):
+        return override
+    return os.path.join(responses_path, filename)
+
+
 def read_current_status(current_path: str) -> tuple[str, str]:
     """Lee status y action del current_state.json. Retorna ('—', '—') si no existe."""
     if not os.path.exists(current_path):

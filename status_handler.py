@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 
-from state_utils import extract_json_body, print_operation_result, read_current_status
+from state_utils import extract_json_body, print_operation_result, read_current_status, resolve_response_file
 
 
 SCENARIOS = {
@@ -57,7 +57,7 @@ class StatusHandlerMixin:
         try:
             print(f"📨  GET {self.path}")
             filename = "get_loyalty_cancel_reasons.json"
-            src = os.path.join(responses_path, filename)
+            src = resolve_response_file(responses_path, self.path, filename)
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
@@ -110,7 +110,7 @@ class StatusHandlerMixin:
             shutil.copy2(src_state, current)
             print(f"✅  {state_name}.json  →  current_state.json")
 
-            src_response = os.path.join(responses_path, f"{response_name}.json")
+            src_response = resolve_response_file(responses_path, self.path, f"{response_name}.json")
             if not os.path.exists(src_response):
                 raise FileNotFoundError(f"Response file no encontrado: {response_name}.json")
 

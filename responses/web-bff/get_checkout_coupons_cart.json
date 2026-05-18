@@ -1,0 +1,73 @@
+HTTP/1.1 200 OK
+x-correlation-id: 66b141f0e5a34e59e4604b6ad3a50e1a
+x-app-version: 3.892.5
+server-timing: traceparent;desc="00-66b141f0e5a34e59e4604b6ad3a50e1a-870c15fb1c0067b5-00"
+traceparent: 00-66b141f0e5a34e59e4604b6ad3a50e1a-870c15fb1c0067b5-00
+x-cloud-trace-context: 66b141f0e5a34e59e4604b6ad3a50e1a/1831182701696887700;o=0
+cross-origin-opener-policy: same-origin
+cross-origin-resource-policy: same-origin
+origin-agent-cluster: ?1
+referrer-policy: no-referrer
+strict-transport-security: max-age=31536000; includeSubDomains
+x-content-type-options: nosniff
+x-dns-prefetch-control: off
+x-download-options: noopen
+x-frame-options: SAMEORIGIN
+x-permitted-cross-domain-policies: none
+x-xss-protection: 0
+vary: Origin
+access-control-allow-credentials: true
+content-type: application/json; charset=utf-8
+x-powered-by: GH: Alpha018, Gianfranco753
+date: Mon, 11 May 2026 23:35:22 GMT
+x-envoy-upstream-service-time: 4
+server: istio-envoy
+Via: 1.1 google
+Alt-Svc: h3=":443"; ma=2592000
+
+[
+    {
+        "endDate": "2035-12-31T23:59:00-06:00",
+        "couponId": "f5528bfe1effd51d824036ecafdee538ed54adcb8b34edce699922b84a34943a",
+        "loyaltyCouponId":"013315673",
+        "offerName": "PROMO  %MONEDERO + MSI PERMANENTE",
+        "description": "30% DE DESCUENTO - PAGO UNICO.",
+        "termsAndConditions": "",
+        "desktopImage": ""
+    },
+    {
+        "endDate": "2035-12-31T23:59:00-06:00",
+        "couponId": "086ac2a98c67d1d1c6ed70f27981085bc33ba46dd92e331ebdf4e20bf6b46609",
+        "loyaltyCouponId":"013315675",
+        "offerName": "PROMO PERMANENTE DESCUENTO % + PAGO DIFERIDO",
+        "description": "30% DE DESCUENTO - PAGO UNICO.",
+        "termsAndConditions": "",
+        "desktopImage": ""
+    },
+    {
+        "endDate": "2035-12-31T23:59:00-06:00",
+        "couponId": "cd9bb1353d35b612376fbf0021ad0709d3bb3fcefeef573b67ba73a44ffd6362",
+        "loyaltyCouponId":"014315673",
+        "offerName": "PROMOCION  DESCUENTO% + MONEDERO% PERMANENTE",
+        "description": "28% DE DESCUENTO - PAGO UNICO.",
+        "termsAndConditions": "",
+        "desktopImage": ""
+    },
+    {
+        "endDate": "2035-12-31T23:59:00-06:00",
+        "couponId": "defd92ba5fe34a4fcc0116284bc1d73c1973aa962261ab890322002a72d06cf7",
+        "offerName": "PROMOCION PERMANENTE % MONEDERO ADICIONAL",
+        "description": "10% DE DESCUENTO ADICIONAL - PRESUPUESTO LIVERPOOL/FABRICAS.",
+        "termsAndConditions": "",
+        "desktopImage": ""
+    },
+    {
+        "endDate": "2035-12-31T23:59:00-06:00",
+        "couponId": "81a5761395a5a2f75334b25847bb11bebd0ca5b156184de207424b80eb6eb8d1",
+        "loyaltyCouponId":"0133156766",
+        "offerName": "PROMO PERMANENTE MONEDERO ELECTRONICO",
+        "description": "30% DE DESCUENTO - PAGO UNICO.",
+        "termsAndConditions": "",
+        "desktopImage": ""
+    }
+]

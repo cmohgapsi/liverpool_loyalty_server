@@ -1,7 +1,7 @@
 import os
 from urllib.parse import parse_qs, urlparse
 
-from state_utils import extract_json_body
+from state_utils import extract_json_body, resolve_response_file
 
 
 class CouponsHandlerMixin:
@@ -10,7 +10,7 @@ class CouponsHandlerMixin:
         try:
             print(f"📨  GET {self.path}  [suffix={suffix}]")
             filename = f"get_loyalty_coupons_redeemed_{suffix}.json"
-            src = os.path.join(responses_path, filename)
+            src = resolve_response_file(responses_path, self.path, filename)
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
@@ -27,7 +27,7 @@ class CouponsHandlerMixin:
         try:
             print(f"📨  GET {self.path}  [suffix={suffix}]")
             filename = f"get_loyalty_coupons_enrolled_{suffix}.json"
-            src = os.path.join(responses_path, filename)
+            src = resolve_response_file(responses_path, self.path, filename)
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
@@ -57,7 +57,7 @@ class CouponsHandlerMixin:
             is_buy_now = params["isBuyNow"][0].lower()
             print(f"📨  GET {self.path}  [isBuyNow={is_buy_now}]  [suffix={suffix}]")
             filename = f"get_checkout_coupons_{suffix}.json"
-            src = os.path.join(responses_path, filename)
+            src = resolve_response_file(responses_path, self.path, filename)
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
