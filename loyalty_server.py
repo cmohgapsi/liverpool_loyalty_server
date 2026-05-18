@@ -23,18 +23,21 @@ BASE_PATH      = _env.get("BASE_PATH", os.path.dirname(__file__))
 STATES_PATH    = os.path.join(BASE_PATH, "states")
 RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
-PORT                = int(_env.get("PORT", 9876))
+PORT                    = int(_env.get("PORT", 9876))
+TARGET_BASE_PATH        = _env.get("TARGET_BASE_PATH", "pocket-bff")
+_base                   = f"/{TARGET_BASE_PATH}"
 COUPONS_LIST_SUFFIX     = _env.get("COUPONS_LIST_SUFFIX",     "empty")
 COUPONS_REDEEMED_SUFFIX = _env.get("COUPONS_REDEEMED_SUFFIX", "empty")
-TARGET_PATH             = _env.get("TARGET_PATH",             "/pocket-bff/users/me/loyalty/status")
-TARGET_COUPONS_PATH     = _env.get("TARGET_COUPONS_PATH",     "/pocket-bff/users/me/loyalty/coupons")
-TARGET_REDEEMED_PATH    = _env.get("TARGET_REDEEMED_PATH",    "/pocket-bff/users/me/loyalty/coupons/redeemed")
-TARGET_ENROLL_PATH      = _env.get("TARGET_ENROLL_PATH",      "/pocket-bff/users/me/loyalty/enroll")
-LOYALTY_MEMBER_ID            = _env.get("LOYALTY_MEMBER_ID",            "720100015844")
-USER_ID                      = int(_env.get("USER_ID",                   2465729859))
-TARGET_CHECKOUT_COUPONS_PATH = _env.get("TARGET_CHECKOUT_COUPONS_PATH",  "/pocket-bff/checkout/coupons")
-CHECKOUT_COUPONS_SUFFIX      = _env.get("CHECKOUT_COUPONS_SUFFIX",       "cart")
-TARGET_CANCEL_REASONS_PATH   = _env.get("TARGET_CANCEL_REASONS_PATH",    "/pocket-bff/loyalty/cancel-reasons")
+LOYALTY_MEMBER_ID       = _env.get("LOYALTY_MEMBER_ID",       "720100015844")
+USER_ID                 = int(_env.get("USER_ID",              2465729859))
+CHECKOUT_COUPONS_SUFFIX = _env.get("CHECKOUT_COUPONS_SUFFIX", "cart")
+
+TARGET_PATH                  = f"{_base}/users/me/loyalty/status"
+TARGET_COUPONS_PATH          = f"{_base}/users/me/loyalty/coupons"
+TARGET_REDEEMED_PATH         = f"{_base}/users/me/loyalty/coupons/redeemed"
+TARGET_ENROLL_PATH           = f"{_base}/users/me/loyalty/enroll"
+TARGET_CHECKOUT_COUPONS_PATH = f"{_base}/checkout/coupons"
+TARGET_CANCEL_REASONS_PATH   = f"{_base}/loyalty/cancel-reasons"
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -110,6 +113,7 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
 if __name__ == "__main__":
     server = HTTPServer(("localhost", PORT), LoyaltyHandler)
     print(f"🚀  Loyalty server corriendo en http://localhost:{PORT}")
+    print(f"🗂️   Base path:  {_base}")
     print(f"📁  States:    {STATES_PATH}")
     print(f"📁  Responses: {RESPONSES_PATH}")
     print(f"🌐  GET  {TARGET_PATH}")
@@ -119,8 +123,6 @@ if __name__ == "__main__":
     print(f"🌐  GET  {TARGET_CANCEL_REASONS_PATH}")
     print(f"🌐  POST  {TARGET_ENROLL_PATH}")
     print(f"🌐  PATCH {TARGET_PATH}")
-    print(f"     Configura en Proxyman: Map Remote")
-    print(f"     ANY ...pocket-bff/users/me/loyalty/*  →  http://localhost:{PORT}/pocket-bff/users/me/loyalty/*")
     print("     Presiona Ctrl+C para detener\n")
     try:
         server.serve_forever()

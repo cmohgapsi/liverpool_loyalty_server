@@ -2,17 +2,17 @@
 
 Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
 
-Atiende siete endpoints:
+Atiende siete endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
 
 | Método | Path | Descripción |
 |---|---|---|
-| `GET` | `/pocket-bff/users/me/loyalty/status` | Devuelve `current_state.json` |
-| `GET` | `/pocket-bff/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
-| `GET` | `/pocket-bff/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
-| `GET` | `/pocket-bff/checkout/coupons?isBuyNow=<bool>` | Devuelve cupones de checkout según `CHECKOUT_COUPONS_SUFFIX` |
-| `GET` | `/pocket-bff/loyalty/cancel-reasons` | Devuelve `get_loyalty_cancel_reasons.json` |
-| `POST` | `/pocket-bff/users/me/loyalty/enroll` | Enrola o re-enrola al usuario según su estado actual |
-| `PATCH` | `/pocket-bff/users/me/loyalty/status` | Aplica transición de estado y devuelve el response correspondiente |
+| `GET` | `/<base>/users/me/loyalty/status` | Devuelve `current_state.json` |
+| `GET` | `/<base>/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
+| `GET` | `/<base>/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
+| `GET` | `/<base>/checkout/coupons?isBuyNow=<bool>` | Devuelve cupones de checkout según `CHECKOUT_COUPONS_SUFFIX` |
+| `GET` | `/<base>/loyalty/cancel-reasons` | Devuelve `get_loyalty_cancel_reasons.json` |
+| `POST` | `/<base>/users/me/loyalty/enroll` | Enrola o re-enrola al usuario según su estado actual |
+| `PATCH` | `/<base>/users/me/loyalty/status` | Aplica transición de estado y devuelve el response correspondiente |
 
 ---
 
@@ -49,7 +49,7 @@ decommission/
 ├── coupons_handler.py                  ← Handler y lógica de cupones (CouponsHandlerMixin)
 ├── enroll_handler.py                   ← Handler y lógica de enrolamiento (EnrollHandlerMixin)
 ├── status_handler.py                   ← Handler y lógica de status (StatusHandlerMixin, SCENARIOS)
-├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, read_current_status, print_operation_result)
+├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, read_current_status, print_operation_result, resolve_response_file)
 └── README.md
 ```
 
@@ -76,52 +76,54 @@ cp .env-example .env
 ```env
 BASE_PATH=/ruta/absoluta/a/decommission
 PORT=9876
-TARGET_PATH=/pocket-bff/users/me/loyalty/status
-TARGET_COUPONS_PATH=/pocket-bff/users/me/loyalty/coupons
+TARGET_BASE_PATH=pocket-bff
 COUPONS_LIST_SUFFIX=empty
-TARGET_REDEEMED_PATH=/pocket-bff/users/me/loyalty/coupons/redeemed
 COUPONS_REDEEMED_SUFFIX=empty
-TARGET_ENROLL_PATH=/pocket-bff/users/me/loyalty/enroll
 LOYALTY_MEMBER_ID=720100015844
 USER_ID=2465729859
-TARGET_CHECKOUT_COUPONS_PATH=/pocket-bff/checkout/coupons
 CHECKOUT_COUPONS_SUFFIX=cart
-TARGET_CANCEL_REASONS_PATH=/pocket-bff/loyalty/cancel-reasons
 ```
 
 | Variable | Valores | Descripción |
 |---|---|---|
 | `BASE_PATH` | ruta absoluta | Ruta a la carpeta `decommission/`. Ajústala si mueves el proyecto. |
 | `PORT` | `9876` | Puerto del servidor local. |
-| `TARGET_PATH` | path | Endpoint de loyalty status (GET y PATCH). |
-| `TARGET_COUPONS_PATH` | path | Endpoint de lista de cupones (GET). |
-| `COUPONS_LIST_SUFFIX` | `empty` · `full` | Archivo de cupones a servir. |
-| `TARGET_REDEEMED_PATH` | path | Endpoint de cupones canjeados (GET). |
+| `TARGET_BASE_PATH` | `pocket-bff` · `web-bff` | Prefijo base de todos los endpoints. Cambia este valor para apuntar a un BFF distinto. |
+| `COUPONS_LIST_SUFFIX` | `empty` · `full` | Archivo de cupones de lealtad a servir. |
 | `COUPONS_REDEEMED_SUFFIX` | `empty` · `full` | Archivo de cupones canjeados a servir. |
-| `TARGET_ENROLL_PATH` | path | Endpoint de enrolamiento (POST). |
 | `LOYALTY_MEMBER_ID` | string | ID de miembro de lealtad retornado en el response de enroll. |
 | `USER_ID` | número | ID de usuario retornado en el response de enroll. |
-| `TARGET_CHECKOUT_COUPONS_PATH` | path | Endpoint de cupones de checkout (GET). |
 | `CHECKOUT_COUPONS_SUFFIX` | `cart` · `no_cart_error` | Archivo de cupones de checkout a servir. |
-| `TARGET_CANCEL_REASONS_PATH` | path | Endpoint de razones de cancelación (GET). |
 
 ---
 
 ## Setup en Proxyman
 
-### Map Remote — Lealtad (loyalty)
+Configura una sola regla Map Remote que cubra todos los endpoints según el `TARGET_BASE_PATH` configurado.
 
-**Match URL** (regex):
+**Match URL** (regex — reemplaza `<base>` con el valor de `TARGET_BASE_PATH`):
 ```
-^\/pocket-bff\/(users\/me\/loyalty\/.*|checkout\/coupons|loyalty\/cancel-reasons)
+^\/<base>\/.*
+```
+
+Ejemplo con `TARGET_BASE_PATH=pocket-bff`:
+```
+^\/pocket-bff\/.*
 ```
 
 **Método:** `ANY`
 
-**Redirect to:**
+**Redirect to** (reemplaza `<base>` con el valor de `TARGET_BASE_PATH`):
+```
+http://localhost:9876/<base>/*
+```
+
+Ejemplo con `TARGET_BASE_PATH=pocket-bff`:
 ```
 http://localhost:9876/pocket-bff/*
 ```
+
+> Si cambias `TARGET_BASE_PATH` en `.env`, actualiza también la regla de Proxyman con el nuevo valor.
 
 ---
 
@@ -131,10 +133,11 @@ http://localhost:9876/pocket-bff/*
 python3 /ruta/a/decommission/loyalty_server.py
 ```
 
-Salida esperada:
+Salida esperada (con `TARGET_BASE_PATH=pocket-bff`):
 
 ```
 🚀  Loyalty server corriendo en http://localhost:9876
+🗂️   Base path:  /pocket-bff
 📁  States:    …/states
 📁  Responses: …/responses
 🌐  GET  /pocket-bff/users/me/loyalty/status
@@ -150,9 +153,26 @@ Salida esperada:
 
 ---
 
+## Override de respuestas por subcarpeta
+
+Antes de servir cualquier archivo de `responses/`, el servidor busca primero en `responses/<base>/` (donde `<base>` es el primer segmento del path de la petición, equivalente a `TARGET_BASE_PATH`).
+
+Si el archivo existe ahí, lo sirve en lugar del archivo por defecto:
+
+```
+responses/
+├── get_loyalty_cancel_reasons.json          ← fallback por defecto
+└── pocket-bff/
+    └── get_loyalty_cancel_reasons.json      ← override: se sirve este si existe
+```
+
+Esto permite mantener variantes por entorno sin modificar los archivos base.
+
+---
+
 ## Endpoints
 
-### GET `/pocket-bff/users/me/loyalty/status`
+### GET `/<base>/users/me/loyalty/status`
 
 Devuelve el contenido actual de `states/current_state.json` e imprime en consola el status y action del estado actual.
 
@@ -166,7 +186,7 @@ Devuelve el contenido actual de `states/current_state.json` e imprime en consola
 
 ---
 
-### GET `/pocket-bff/users/me/loyalty/coupons`
+### GET `/<base>/users/me/loyalty/coupons`
 
 Devuelve `responses/get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json`.
 
@@ -183,7 +203,7 @@ COUPONS_LIST_SUFFIX=full
 
 ---
 
-### GET `/pocket-bff/users/me/loyalty/coupons/redeemed`
+### GET `/<base>/users/me/loyalty/coupons/redeemed`
 
 Devuelve `responses/get_loyalty_coupons_redeemed_{COUPONS_REDEEMED_SUFFIX}.json`.
 
@@ -200,7 +220,7 @@ COUPONS_REDEEMED_SUFFIX=full
 
 ---
 
-### GET `/pocket-bff/checkout/coupons?isBuyNow=<bool>`
+### GET `/<base>/checkout/coupons?isBuyNow=<bool>`
 
 Devuelve `responses/get_checkout_coupons_{CHECKOUT_COUPONS_SUFFIX}.json`.
 
@@ -226,7 +246,7 @@ CHECKOUT_COUPONS_SUFFIX=no_cart_error
 
 ---
 
-### GET `/pocket-bff/loyalty/cancel-reasons`
+### GET `/<base>/loyalty/cancel-reasons`
 
 Devuelve el contenido de `responses/get_loyalty_cancel_reasons.json` sin ningún parámetro adicional.
 
@@ -237,7 +257,7 @@ Devuelve el contenido de `responses/get_loyalty_cancel_reasons.json` sin ningún
 
 ---
 
-### POST `/pocket-bff/users/me/loyalty/enroll`
+### POST `/<base>/users/me/loyalty/enroll`
 
 Enrola o re-enrola al usuario. El comportamiento depende del valor actual de `loyaltyData.status` en `current_state.json`.
 
@@ -329,7 +349,7 @@ Valida que el body esté vacío `{}`, actualiza `current_state.json` y retorna 2
 
 ---
 
-### PATCH `/pocket-bff/users/me/loyalty/status`
+### PATCH `/<base>/users/me/loyalty/status`
 
 Recibe un body JSON con `action` y `value`, aplica la transición de estado correspondiente y devuelve el response del escenario.
 
@@ -383,7 +403,7 @@ cp states/enrolled_welcome_state.json states/current_state.json
 ## Cómo funciona
 
 ```
-App → GET /pocket-bff/users/me/loyalty/status
+App → GET /<base>/users/me/loyalty/status
         │
         ▼
   Proxyman Map Remote → localhost:9876
@@ -397,35 +417,35 @@ App ← estado actual de lealtad
 
 ─────────────────────────────────────────────
 
-App → GET /pocket-bff/users/me/loyalty/coupons
+App → GET /<base>/users/me/loyalty/coupons
         │
         ▼
   Proxyman Map Remote → localhost:9876
         │
         ▼
   loyalty_server.py → coupons_handler.py
-        └─ Lee get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json
+        └─ resolve_response_file → get_loyalty_coupons_enrolled_{suffix}.json
         │
         ▼
 App ← lista de cupones (empty | full)
 
 ─────────────────────────────────────────────
 
-App → GET /pocket-bff/users/me/loyalty/coupons/redeemed
+App → GET /<base>/users/me/loyalty/coupons/redeemed
         │
         ▼
   Proxyman Map Remote → localhost:9876
         │
         ▼
   loyalty_server.py → coupons_handler.py
-        └─ Lee get_loyalty_coupons_redeemed_{COUPONS_REDEEMED_SUFFIX}.json
+        └─ resolve_response_file → get_loyalty_coupons_redeemed_{suffix}.json
         │
         ▼
 App ← lista de cupones canjeados (empty | full)
 
 ─────────────────────────────────────────────
 
-App → GET /pocket-bff/checkout/coupons?isBuyNow=false
+App → GET /<base>/checkout/coupons?isBuyNow=false
         │
         ▼
   Proxyman Map Remote → localhost:9876
@@ -433,28 +453,28 @@ App → GET /pocket-bff/checkout/coupons?isBuyNow=false
         ▼
   loyalty_server.py → coupons_handler.py
         ├─ Valida presencia de parámetro isBuyNow → 400 si falta
-        └─ Lee get_checkout_coupons_{CHECKOUT_COUPONS_SUFFIX}.json
+        └─ resolve_response_file → get_checkout_coupons_{suffix}.json
         │
         ▼
 App ← cupones de checkout (cart | no_cart_error)
 
 ─────────────────────────────────────────────
 
-App → GET /pocket-bff/loyalty/cancel-reasons
+App → GET /<base>/loyalty/cancel-reasons
         │
         ▼
   Proxyman Map Remote → localhost:9876
         │
         ▼
   loyalty_server.py → status_handler.py
-        └─ Lee get_loyalty_cancel_reasons.json
+        └─ resolve_response_file → get_loyalty_cancel_reasons.json
         │
         ▼
 App ← lista de razones de cancelación
 
 ─────────────────────────────────────────────
 
-App → POST /pocket-bff/users/me/loyalty/enroll
+App → POST /<base>/users/me/loyalty/enroll
         │
         ▼
   Proxyman Map Remote → localhost:9876
@@ -471,7 +491,7 @@ App ← response de enroll con loyaltyMemberId, userId, memberSince
 
 ─────────────────────────────────────────────
 
-App → PATCH /pocket-bff/users/me/loyalty/status
+App → PATCH /<base>/users/me/loyalty/status
         │
         ▼
   Proxyman Map Remote → localhost:9876
@@ -479,9 +499,10 @@ App → PATCH /pocket-bff/users/me/loyalty/status
         ▼
   loyalty_server.py → status_handler.py
         ├─ Lee action + value del body
+        ├─ unenroll → valida cancelReason (string) → 400 si falta
         ├─ Busca en SCENARIOS
         ├─ Copia state_X.json → current_state.json
-        └─ Retorna responses/path_status_X.json
+        └─ resolve_response_file → path_status_X.json
         │
         ▼
 App ← response del PATCH con nuevo estado
