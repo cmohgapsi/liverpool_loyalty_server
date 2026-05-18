@@ -111,11 +111,17 @@ TARGET_CANCEL_REASONS_PATH=/pocket-bff/loyalty/cancel-reasons
 
 ### Map Remote — Lealtad (loyalty)
 
-| Campo | Valor |
-|---|---|
-| Match URL | ```^\/pocket-bff\/(users\/me\/loyalty\/.*|checkout\/coupons|loyalty\/cancel-reasons)``` |
-| Método | `ANY` |
-| Redirect to | ```http://localhost:9876/pocket-bff/*``` |
+**Match URL** (regex):
+```
+^\/pocket-bff\/(users\/me\/loyalty\/.*|checkout\/coupons|loyalty\/cancel-reasons)
+```
+
+**Método:** `ANY`
+
+**Redirect to:**
+```
+http://localhost:9876/pocket-bff/*
+```
 
 ---
 
