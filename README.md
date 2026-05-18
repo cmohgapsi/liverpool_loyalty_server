@@ -21,6 +21,10 @@ Atiende ocho endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE
 
 ```
 decommission/
+├── client/
+│   ├── index.html                          ← Cliente web (abrir en browser con el servidor corriendo)
+│   ├── index.js                            ← Lógica del cliente
+│   └── README.md                           ← Documentación del cliente → ver client/README.md
 ├── documentation/
 │   ├── LIVERPOOL-DECOMMISSION.postman_collection.json  ← Colección Postman con los endpoints
 │   └── LoyaltyStatus.png                               ← Diagrama de estados de lealtad
@@ -422,6 +426,19 @@ Si el `action` no coincide con ningún escenario, el servidor responde `200` con
   └─────────────────────────────────────────────────────────────────────────────────────────┘
 📤  Retornando path_status_enrolled.json
 ```
+
+---
+
+## Cliente web
+
+El directorio `client/` incluye una interfaz HTML que permite interactuar con el servidor sin necesidad de Postman o curl.
+
+```bash
+# Con el servidor corriendo, abre directamente en el browser:
+open client/index.html
+```
+
+Consulta **[client/README.md](client/README.md)** para ver la documentación completa del cliente.
 
 ---
 
