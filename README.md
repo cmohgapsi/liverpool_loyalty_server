@@ -9,6 +9,7 @@ Atiende cinco endpoints:
 | `GET` | `/pocket-bff/users/me/loyalty/status` | Devuelve `current_state.json` |
 | `GET` | `/pocket-bff/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
 | `GET` | `/pocket-bff/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
+| `GET` | `/pocket-bff/checkout/coupons?isBuyNow=<bool>` | Devuelve cupones de checkout según `CHECKOUT_COUPONS_SUFFIX` |
 | `POST` | `/pocket-bff/users/me/loyalty/enroll` | Enrola o re-enrola al usuario según su estado actual |
 | `PATCH` | `/pocket-bff/users/me/loyalty/status` | Aplica transición de estado y devuelve el response correspondiente |
 
@@ -37,7 +38,9 @@ decommission/
 │   ├── get_loyalty_coupons_enrolled_empty.json
 │   ├── get_loyalty_coupons_enrolled_full.json
 │   ├── get_loyalty_coupons_redeemed_empty.json
-│   └── get_loyalty_coupons_redeemed_full.json
+│   ├── get_loyalty_coupons_redeemed_full.json
+│   ├── get_checkout_coupons_cart.json
+│   └── get_checkout_coupons_no_cart_error.json
 ├── .env                                ← Variables de entorno (no versionado, créalo desde .env-example)
 ├── .env-example                        ← Plantilla de variables de entorno
 ├── loyalty_server.py                   ← Servidor local: routing y configuración
@@ -93,18 +96,28 @@ USER_ID=2465729859
 | `TARGET_ENROLL_PATH` | path | Endpoint de enrolamiento (POST). |
 | `LOYALTY_MEMBER_ID` | string | ID de miembro de lealtad retornado en el response de enroll. |
 | `USER_ID` | número | ID de usuario retornado en el response de enroll. |
+| `TARGET_CHECKOUT_COUPONS_PATH` | path | Endpoint de cupones de checkout (GET). |
+| `CHECKOUT_COUPONS_SUFFIX` | `cart` · `no_cart_error` | Archivo de cupones de checkout a servir. |
 
 ---
 
 ## Setup en Proxyman
 
-Una sola regla Map Remote cubre todos los endpoints:
+### Map Remote — Lealtad (loyalty)
 
 | Campo | Valor |
 |---|---|
 | Match URL | `https://<host>/pocket-bff/users/me/loyalty/*` |
 | Método | `ANY` |
 | Redirect to | `http://localhost:9876/pocket-bff/users/me/loyalty/*` |
+
+### Map Remote — Checkout coupons
+
+| Campo | Valor |
+|---|---|
+| Match URL | `https://<host>/pocket-bff/checkout/coupons` |
+| Método | `GET` |
+| Redirect to | `http://localhost:9876/pocket-bff/checkout/coupons` |
 
 ---
 
@@ -123,6 +136,7 @@ Salida esperada:
 🌐  GET  /pocket-bff/users/me/loyalty/status
 🌐  GET  /pocket-bff/users/me/loyalty/coupons  [suffix=full]
 🌐  GET  /pocket-bff/users/me/loyalty/coupons/redeemed  [suffix=empty]
+🌐  GET  /pocket-bff/checkout/coupons?isBuyNow=<bool>  [suffix=cart]
 🌐  POST  /pocket-bff/users/me/loyalty/enroll
 🌐  PATCH /pocket-bff/users/me/loyalty/status
 ```
@@ -177,6 +191,32 @@ COUPONS_REDEEMED_SUFFIX=full
 ```
 📨  GET /pocket-bff/users/me/loyalty/coupons/redeemed  [suffix=full]
 📤  Retornando get_loyalty_coupons_redeemed_full.json
+```
+
+---
+
+### GET `/pocket-bff/checkout/coupons?isBuyNow=<bool>`
+
+Devuelve `responses/get_checkout_coupons_{CHECKOUT_COUPONS_SUFFIX}.json`.
+
+El parámetro `isBuyNow` es **obligatorio**. Si no se incluye, el servidor responde 400.
+
+**Response 400** (parámetro faltante):
+```json
+{
+  "status": { "status": "ERROR", "statusCode": 400, "successMessage": "Missing required parameter: isBuyNow" }
+}
+```
+
+Para cambiar el archivo servido, edita `CHECKOUT_COUPONS_SUFFIX` en `.env` y reinicia el servidor:
+
+```env
+CHECKOUT_COUPONS_SUFFIX=no_cart_error
+```
+
+```
+📨  GET /pocket-bff/checkout/coupons?isBuyNow=false  [isBuyNow=false]  [suffix=cart]
+📤  Retornando get_checkout_coupons_cart.json
 ```
 
 ---
@@ -361,6 +401,21 @@ App → GET /pocket-bff/users/me/loyalty/coupons/redeemed
         │
         ▼
 App ← lista de cupones canjeados (empty | full)
+
+─────────────────────────────────────────────
+
+App → GET /pocket-bff/checkout/coupons?isBuyNow=false
+        │
+        ▼
+  Proxyman Map Remote → localhost:9876
+        │
+        ▼
+  loyalty_server.py → coupons_handler.py
+        ├─ Valida presencia de parámetro isBuyNow → 400 si falta
+        └─ Lee get_checkout_coupons_{CHECKOUT_COUPONS_SUFFIX}.json
+        │
+        ▼
+App ← cupones de checkout (cart | no_cart_error)
 
 ─────────────────────────────────────────────
 

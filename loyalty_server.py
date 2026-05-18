@@ -30,8 +30,10 @@ TARGET_PATH             = _env.get("TARGET_PATH",             "/pocket-bff/users
 TARGET_COUPONS_PATH     = _env.get("TARGET_COUPONS_PATH",     "/pocket-bff/users/me/loyalty/coupons")
 TARGET_REDEEMED_PATH    = _env.get("TARGET_REDEEMED_PATH",    "/pocket-bff/users/me/loyalty/coupons/redeemed")
 TARGET_ENROLL_PATH      = _env.get("TARGET_ENROLL_PATH",      "/pocket-bff/users/me/loyalty/enroll")
-LOYALTY_MEMBER_ID       = _env.get("LOYALTY_MEMBER_ID",       "720100015844")
-USER_ID                 = int(_env.get("USER_ID",              2465729859))
+LOYALTY_MEMBER_ID            = _env.get("LOYALTY_MEMBER_ID",            "720100015844")
+USER_ID                      = int(_env.get("USER_ID",                   2465729859))
+TARGET_CHECKOUT_COUPONS_PATH = _env.get("TARGET_CHECKOUT_COUPONS_PATH",  "/pocket-bff/checkout/coupons")
+CHECKOUT_COUPONS_SUFFIX      = _env.get("CHECKOUT_COUPONS_SUFFIX",       "cart")
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -43,13 +45,17 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
         self.end_headers()
 
     def do_GET(self):
-        if self.path == TARGET_REDEEMED_PATH:
+        path = self.path.split("?")[0]
+        if path == TARGET_REDEEMED_PATH:
             self._handle_get_redeemed(RESPONSES_PATH, COUPONS_REDEEMED_SUFFIX)
             return
-        if self.path == TARGET_COUPONS_PATH:
+        if path == TARGET_COUPONS_PATH:
             self._handle_get_coupons(RESPONSES_PATH, COUPONS_LIST_SUFFIX)
             return
-        if self.path != TARGET_PATH:
+        if path == TARGET_CHECKOUT_COUPONS_PATH:
+            self._handle_get_checkout_coupons(RESPONSES_PATH, CHECKOUT_COUPONS_SUFFIX)
+            return
+        if path != TARGET_PATH:
             self._not_found()
             return
         self._handle_get_status(CURRENT)
@@ -105,6 +111,7 @@ if __name__ == "__main__":
     print(f"🌐  GET  {TARGET_PATH}")
     print(f"🌐  GET  {TARGET_COUPONS_PATH}  [suffix={COUPONS_LIST_SUFFIX}]")
     print(f"🌐  GET  {TARGET_REDEEMED_PATH}  [suffix={COUPONS_REDEEMED_SUFFIX}]")
+    print(f"🌐  GET  {TARGET_CHECKOUT_COUPONS_PATH}?isBuyNow=<bool>  [suffix={CHECKOUT_COUPONS_SUFFIX}]")
     print(f"🌐  POST  {TARGET_ENROLL_PATH}")
     print(f"🌐  PATCH {TARGET_PATH}")
     print(f"     Configura en Proxyman: Map Remote")
