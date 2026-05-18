@@ -2,7 +2,7 @@
 
 Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
 
-Atiende seis endpoints:
+Atiende siete endpoints:
 
 | Método | Path | Descripción |
 |---|---|---|
@@ -84,6 +84,9 @@ COUPONS_REDEEMED_SUFFIX=empty
 TARGET_ENROLL_PATH=/pocket-bff/users/me/loyalty/enroll
 LOYALTY_MEMBER_ID=720100015844
 USER_ID=2465729859
+TARGET_CHECKOUT_COUPONS_PATH=/pocket-bff/checkout/coupons
+CHECKOUT_COUPONS_SUFFIX=cart
+TARGET_CANCEL_REASONS_PATH=/pocket-bff/loyalty/cancel-reasons
 ```
 
 | Variable | Valores | Descripción |
@@ -110,25 +113,9 @@ USER_ID=2465729859
 
 | Campo | Valor |
 |---|---|
-| Match URL | `https://<host>/pocket-bff/users/me/loyalty/*` |
+| Match URL | ```^\/pocket-bff\/(users\/me\/loyalty\/.*|checkout\/coupons|loyalty\/cancel-reasons)``` |
 | Método | `ANY` |
-| Redirect to | `http://localhost:9876/pocket-bff/users/me/loyalty/*` |
-
-### Map Remote — Checkout coupons
-
-| Campo | Valor |
-|---|---|
-| Match URL | `https://<host>/pocket-bff/checkout/coupons` |
-| Método | `GET` |
-| Redirect to | `http://localhost:9876/pocket-bff/checkout/coupons` |
-
-### Map Remote — Cancel reasons
-
-| Campo | Valor |
-|---|---|
-| Match URL | `https://<host>/pocket-bff/loyalty/cancel-reasons` |
-| Método | `GET` |
-| Redirect to | `http://localhost:9876/pocket-bff/loyalty/cancel-reasons` |
+| Redirect to | ```http://localhost:9876/pocket-bff/*``` |
 
 ---
 
