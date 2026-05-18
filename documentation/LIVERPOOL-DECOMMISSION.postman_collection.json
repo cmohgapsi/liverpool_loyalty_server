@@ -25,14 +25,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/status",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -338,14 +336,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/status",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -452,14 +448,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/status",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/status",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -642,14 +636,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/coupons",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/coupons",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -750,14 +742,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/coupons/redeemed",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/coupons/redeemed",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -859,14 +849,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/enroll",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/enroll",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -980,14 +968,12 @@
               }
             },
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/users/me/loyalty/enroll",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/users/me/loyalty/enroll",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "users",
                 "me",
                 "loyalty",
@@ -1096,14 +1082,12 @@
               }
             ],
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/checkout/coupons?isBuyNow=false",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/checkout/coupons?isBuyNow=false",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "checkout",
                 "coupons"
               ],
@@ -1123,14 +1107,12 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "http://localhost:9876/pocket-bff/loyalty/cancel-reasons",
-              "protocol": "http",
+              "raw": "{{BASE_URL}}/{{BASE_PATH}}/loyalty/cancel-reasons",
               "host": [
-                "localhost"
+                "{{BASE_URL}}"
               ],
-              "port": "9876",
               "path": [
-                "pocket-bff",
+                "{{BASE_PATH}}",
                 "loyalty",
                 "cancel-reasons"
               ]
