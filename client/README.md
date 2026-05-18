@@ -109,3 +109,15 @@ Tras la respuesta exitosa del servidor:
 |---|---|
 | `index.html` | Estructura, estilos CSS y markup del panel |
 | `index.js` | Lógica: fetch, render, dirty-state, panel toggle |
+
+---
+
+## Arquitectura del cliente
+
+El cliente descubre la configuración del servidor en el arranque:
+
+1. `GET /configuration` → obtiene `paths`, `TARGET_BASE_PATH` y todos los valores configurables.
+2. Usa `paths.status` para construir la URL del `GET /<base>/users/me/loyalty/status`.
+3. `PUT /configuration` → actualiza los valores en el servidor sin reiniciarlo; el cliente re-pinta el panel y recarga el status con los nuevos paths.
+
+De esta forma, cambiar `TARGET_BASE_PATH` desde el panel aplica inmediatamente sin tocar el código ni reiniciar el servidor.

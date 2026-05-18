@@ -119,6 +119,15 @@ class StatusHandlerMixin:
 
             new_status = response_body.get("data", {}).get("loyaltyStatus", "—").upper()
             new_action = response_body.get("data", {}).get("action", "—").upper()
+            self._request_body = data
+            self._log_extras = {
+                "prev_status": prev_status,
+                "prev_action": prev_action,
+                "operation":   "STATUS",
+                "action":      action,
+                "new_status":  new_status,
+                "new_action":  new_action,
+            }
             print_operation_result(prev_status, prev_action, "STATUS", action, new_status, new_action)
 
             print(f"📤  Retornando {response_name}.json")

@@ -12,7 +12,9 @@ import json
 import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-from state_utils import load_env
+from state_utils import load_env, log_request
+from config_handler import CONFIG, VERSION, CONFIGURATION_PATH, _paths, ConfigHandlerMixin
+from log_handler import LogHandlerMixin
 from coupons_handler import CouponsHandlerMixin
 from enroll_handler import EnrollHandlerMixin
 from status_handler import StatusHandlerMixin
@@ -23,39 +25,12 @@ BASE_PATH      = _env.get("BASE_PATH", os.path.dirname(__file__))
 STATES_PATH    = os.path.join(BASE_PATH, "states")
 RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
-VERSION            = _env.get("VERSION", "0.0.0")
-PORT               = int(_env.get("PORT", 9876))
-CONFIGURATION_PATH = "/configuration"
-
-# ─── Configuración mutable — inicializada desde .env ─────────────────────────
-# Se puede actualizar en caliente vía PUT /configuration sin reiniciar.
-CONFIG = {
-    "TARGET_BASE_PATH":        _env.get("TARGET_BASE_PATH",        "pocket-bff"),
-    "COUPONS_LIST_SUFFIX":     _env.get("COUPONS_LIST_SUFFIX",     "empty"),
-    "COUPONS_REDEEMED_SUFFIX": _env.get("COUPONS_REDEEMED_SUFFIX", "empty"),
-    "CHECKOUT_COUPONS_SUFFIX": _env.get("CHECKOUT_COUPONS_SUFFIX", "cart"),
-    "LOYALTY_MEMBER_ID":       _env.get("LOYALTY_MEMBER_ID",       "720100015844"),
-    "USER_ID":                 int(_env.get("USER_ID",             2465729859)),
-}
-_CONFIGURABLE = set(CONFIG.keys())
+PORT           = int(_env.get("PORT", 9876))
+LOG_PATH       = "/log"
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def _paths() -> dict[str, str]:
-    """Computa los paths desde CONFIG['TARGET_BASE_PATH'] en cada llamada."""
-    b = f"/{CONFIG['TARGET_BASE_PATH']}"
-    return {
-        "status":          f"{b}/users/me/loyalty/status",
-        "coupons":         f"{b}/users/me/loyalty/coupons",
-        "redeemed":        f"{b}/users/me/loyalty/coupons/redeemed",
-        "enroll":          f"{b}/users/me/loyalty/enroll",
-        "checkoutCoupons": f"{b}/checkout/coupons",
-        "cancelReasons":   f"{b}/loyalty/cancel-reasons",
-        "configuration":   CONFIGURATION_PATH,
-    }
-
-
-class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
+class LoyaltyHandler(ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -67,6 +42,9 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
         p = _paths()
         if path == CONFIGURATION_PATH:
             self._handle_get_configuration()
+            return
+        if path == LOG_PATH:
+            self._handle_get_log()
             return
         if path == p["redeemed"]:
             self._handle_get_redeemed(RESPONSES_PATH, CONFIG["COUPONS_REDEEMED_SUFFIX"])
@@ -105,48 +83,11 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
             return
         self._handle_put_configuration()
 
-    # ── Handlers propios ──────────────────────────────────────────────────────
-    def _handle_get_configuration(self):
-        print(f"📨  GET {self.path}")
-        payload = {
-            "version": VERSION,
-            **CONFIG,
-            "paths": _paths(),
-        }
-        print(f"📤  Retornando configuración del servidor")
-        self._respond(200, payload)
-        print()
-
-    def _handle_put_configuration(self):
-        try:
-            length = int(self.headers.get("Content-Length", 0))
-            body   = json.loads(self.rfile.read(length).decode("utf-8"))
-
-            updated = {}
-            ignored = {}
-            for key, value in body.items():
-                if key in _CONFIGURABLE:
-                    CONFIG[key] = int(value) if key == "USER_ID" else value
-                    updated[key] = CONFIG[key]
-                else:
-                    ignored[key] = value
-
-            print(f"🔧  PUT {self.path}")
-            for k, v in updated.items():
-                print(f"    {k} = {v}")
-            if ignored:
-                print(f"    ⚠️  ignorados (no configurables): {list(ignored.keys())}")
-            print()
-
-            self._respond(200, {
-                "status": {"status": "OK", "statusCode": 0},
-                "updated":       updated,
-                "configuration": {"version": VERSION, **CONFIG, "paths": _paths()},
-            })
-        except Exception as e:
-            print(f"❌  Error: {e}")
-            self._respond(500, {"error": str(e)})
-            print()
+    def do_DELETE(self):
+        if self.path != LOG_PATH:
+            self._not_found()
+            return
+        self._handle_delete_log()
 
     # ── Helpers ───────────────────────────────────────────────────────────────
     def _not_found(self):
@@ -159,7 +100,7 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
 
     def _send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, x-correlation-id")
 
     def _respond(self, code, payload):
@@ -173,6 +114,14 @@ class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin
         self._send_cors_headers()
         self.end_headers()
         self.wfile.write(body)
+        log_request(
+            self.command,
+            *self.server.server_address,
+            self.path,
+            code,
+            getattr(self, "_request_body", None),
+            **getattr(self, "_log_extras", {}),
+        )
 
     def log_message(self, *args):
         pass  # silencia logs HTTP del servidor
@@ -186,8 +135,10 @@ if __name__ == "__main__":
     print(f"🗂️   Base path:  /{CONFIG['TARGET_BASE_PATH']}")
     print(f"📁  States:    {STATES_PATH}")
     print(f"📁  Responses: {RESPONSES_PATH}")
-    print(f"🌐  GET   {CONFIGURATION_PATH}")
-    print(f"🌐  PUT   {CONFIGURATION_PATH}")
+    print(f"🌐  GET    {CONFIGURATION_PATH}")
+    print(f"🌐  GET    {LOG_PATH}")
+    print(f"🌐  PUT    {CONFIGURATION_PATH}")
+    print(f"🌐  DELETE {LOG_PATH}")
     print(f"🌐  GET   {p['status']}")
     print(f"🌐  GET   {p['coupons']}  [suffix={CONFIG['COUPONS_LIST_SUFFIX']}]")
     print(f"🌐  GET   {p['redeemed']}  [suffix={CONFIG['COUPONS_REDEEMED_SUFFIX']}]")

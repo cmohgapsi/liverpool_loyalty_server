@@ -1,5 +1,8 @@
 import json
 import os
+from datetime import datetime
+
+LOG_FILE = os.path.join(os.path.dirname(__file__), "server.log")
 
 
 def load_env(path: str) -> dict[str, str]:
@@ -23,6 +26,29 @@ def extract_json_body(raw: str) -> dict:
         if separator in raw:
             return json.loads(raw.split(separator, 1)[1].strip())
     return json.loads(raw.strip())
+
+
+def build_curl(method: str, host: str, port: int, path: str, body: dict | None = None) -> str:
+    url   = f"http://{host}:{port}{path}"
+    parts = [f'curl -X {method} "{url}"']
+    if body is not None:
+        parts.append('-H "Content-Type: application/json"')
+        parts.append(f"-d '{json.dumps(body, ensure_ascii=False)}'")
+    return " ".join(parts)
+
+
+def log_request(method: str, host: str, port: int, path: str,
+                http_code: int, body: dict | None = None, **extras):
+    entry = {
+        "method":           method,
+        "path":             path,
+        "http_code":        http_code,
+        "request_datetime": datetime.now().isoformat(),
+        "curl":             build_curl(method, host, port, path, body),
+        **extras,
+    }
+    with open(LOG_FILE, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 def print_operation_result(prev_status: str, prev_action: str,

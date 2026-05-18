@@ -83,3 +83,4 @@ htmlcov/
 
 # pyenv
 # .python-version
+server.log

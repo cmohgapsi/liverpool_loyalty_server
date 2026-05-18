@@ -2,11 +2,14 @@
 
 Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
 
-Atiende ocho endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
+Atiende once endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
 
 | Método | Path | Descripción |
 |---|---|---|
 | `GET` | `/configuration` | Devuelve la configuración activa del servidor |
+| `PUT` | `/configuration` | Actualiza en memoria los valores de configuración |
+| `GET` | `/log` | Devuelve el historial de requests (más reciente primero) |
+| `DELETE` | `/log` | Vacía el historial de requests (`server.log`) |
 | `GET` | `/<base>/users/me/loyalty/status` | Devuelve `current_state.json` |
 | `GET` | `/<base>/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
 | `GET` | `/<base>/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
@@ -50,11 +53,14 @@ decommission/
 │   └── get_loyalty_cancel_reasons.json
 ├── .env                                ← Variables de entorno (no versionado, créalo desde .env-example)
 ├── .env-example                        ← Plantilla de variables de entorno
-├── loyalty_server.py                   ← Servidor local: routing y configuración
+├── loyalty_server.py                   ← Servidor local: routing y entry point
+├── config_handler.py                   ← CONFIG, _paths(), GET/PUT /configuration (ConfigHandlerMixin)
+├── log_handler.py                      ← GET/DELETE /log (LogHandlerMixin)
 ├── coupons_handler.py                  ← Handler y lógica de cupones (CouponsHandlerMixin)
 ├── enroll_handler.py                   ← Handler y lógica de enrolamiento (EnrollHandlerMixin)
 ├── status_handler.py                   ← Handler y lógica de status (StatusHandlerMixin, SCENARIOS)
-├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, read_current_status, print_operation_result, resolve_response_file)
+├── state_utils.py                      ← Utilidades compartidas (load_env, extract_json_body, log_request, resolve_response_file, …)
+├── server.log                          ← Historial de requests (generado automáticamente, ignorado en git)
 └── README.md
 ```
 
@@ -130,7 +136,7 @@ Ejemplo con `TARGET_BASE_PATH=pocket-bff`:
 http://localhost:9876/pocket-bff/*
 ```
 
-> Si cambias `TARGET_BASE_PATH` en `.env`, actualiza también la regla de Proxyman con el nuevo valor.
+> Si cambias `TARGET_BASE_PATH` (en `.env` o vía `PUT /configuration`), actualiza también la regla de Proxyman con el nuevo valor.
 
 ---
 
@@ -147,14 +153,17 @@ Salida esperada (con `TARGET_BASE_PATH=pocket-bff`):
 🗂️   Base path:  /pocket-bff
 📁  States:    …/states
 📁  Responses: …/responses
-🌐  GET  /pocket-bff/users/me/loyalty/status
-🌐  GET  /pocket-bff/users/me/loyalty/coupons  [suffix=full]
-🌐  GET  /pocket-bff/users/me/loyalty/coupons/redeemed  [suffix=empty]
-🌐  GET  /pocket-bff/checkout/coupons?isBuyNow=<bool>  [suffix=cart]
-🌐  GET  /pocket-bff/loyalty/cancel-reasons
+🌐  GET    /configuration
+🌐  GET    /log
+🌐  PUT    /configuration
+🌐  DELETE /log
+🌐  GET   /pocket-bff/users/me/loyalty/status
+🌐  GET   /pocket-bff/users/me/loyalty/coupons  [suffix=full]
+🌐  GET   /pocket-bff/users/me/loyalty/coupons/redeemed  [suffix=empty]
+🌐  GET   /pocket-bff/checkout/coupons?isBuyNow=<bool>  [suffix=cart]
+🌐  GET   /pocket-bff/loyalty/cancel-reasons
 🌐  POST  /pocket-bff/users/me/loyalty/enroll
 🌐  PATCH /pocket-bff/users/me/loyalty/status
-🌐  GET  /configuration
 ```
 
 > Mantén esta terminal abierta durante toda la sesión de prueba.
@@ -182,7 +191,7 @@ Esto permite mantener variantes por entorno sin modificar los archivos base.
 
 ### GET `/configuration`
 
-Devuelve la configuración activa cargada desde `.env`. No requiere base path ni parámetros.
+Devuelve la configuración activa. Los valores reflejan el estado en memoria (inicialmente los del `.env`, modificables en caliente con `PUT /configuration`). No requiere base path ni parámetros.
 
 ```json
 {
@@ -209,6 +218,91 @@ Devuelve la configuración activa cargada desde `.env`. No requiere base path ni
 ```
 📨  GET /configuration
 📤  Retornando configuración del servidor
+```
+
+---
+
+### PUT `/configuration`
+
+Actualiza en memoria uno o más valores configurables sin reiniciar el servidor. Los campos no reconocidos se ignoran.
+
+**Campos configurables:**
+
+| Campo | Tipo | Valores posibles |
+|---|---|---|
+| `TARGET_BASE_PATH` | string | `pocket-bff` · `web-bff` |
+| `COUPONS_LIST_SUFFIX` | string | `empty` · `full` |
+| `COUPONS_REDEEMED_SUFFIX` | string | `empty` · `full` |
+| `CHECKOUT_COUPONS_SUFFIX` | string | `cart` · `no_cart_error` |
+| `LOYALTY_MEMBER_ID` | string | cualquier string |
+| `USER_ID` | number | cualquier número |
+
+**Body de ejemplo:**
+```json
+{ "TARGET_BASE_PATH": "web-bff", "COUPONS_LIST_SUFFIX": "full" }
+```
+
+**Response 200:**
+```json
+{
+  "status": { "status": "OK", "statusCode": 0 },
+  "updated": { "TARGET_BASE_PATH": "web-bff", "COUPONS_LIST_SUFFIX": "full" },
+  "configuration": { "version": "1.0.0", "TARGET_BASE_PATH": "web-bff", "…": "…", "paths": {} }
+}
+```
+
+```
+🔧  PUT /configuration
+    TARGET_BASE_PATH = web-bff
+    COUPONS_LIST_SUFFIX = full
+```
+
+> Si cambias `TARGET_BASE_PATH`, actualiza también la regla de Map Remote en Proxyman.
+
+---
+
+### GET `/log`
+
+Devuelve un arreglo JSON con todos los requests registrados en `server.log`, ordenados del más reciente al más antiguo.
+
+**Response 200:**
+```json
+[
+  {
+    "method": "PATCH",
+    "path": "/web-bff/users/me/loyalty/status",
+    "http_code": 200,
+    "request_datetime": "2026-05-18T14:32:01.123456",
+    "curl": "curl -X PATCH \"http://localhost:9876/web-bff/users/me/loyalty/status\" -H \"Content-Type: application/json\" -d '{\"action\": \"welcomeModalClosed\", \"value\": true}'",
+    "prev_status": "ENROLLED",
+    "prev_action": "DISPLAYWELCOMEMODAL",
+    "operation": "STATUS",
+    "action": "welcomeModalClosed",
+    "new_status": "ENROLLED",
+    "new_action": "NONE"
+  }
+]
+```
+
+```
+📨  GET /log
+📤  Retornando 12 entradas del log
+```
+
+---
+
+### DELETE `/log`
+
+Vacía el archivo `server.log`. No elimina el archivo, solo borra su contenido.
+
+**Response 200:**
+```json
+{ "status": { "status": "OK", "statusCode": 0, "successMessage": "Log cleared" } }
+```
+
+```
+🗑️   DELETE /log
+✅  server.log vaciado
 ```
 
 ---
@@ -454,9 +548,47 @@ cp states/enrolled_welcome_state.json states/current_state.json
 
 ---
 
+## server.log
+
+Cada request recibido por el servidor queda registrado como una línea JSONL en `server.log`:
+
+```json
+{
+  "method": "GET",
+  "path": "/web-bff/users/me/loyalty/status",
+  "http_code": 200,
+  "request_datetime": "2026-05-18T14:32:01.123456",
+  "curl": "curl -X GET \"http://localhost:9876/web-bff/users/me/loyalty/status\""
+}
+```
+
+Los requests de transición de estado y enrolamiento incluyen campos adicionales: `prev_status`, `prev_action`, `operation`, `action`, `new_status`, `new_action`.
+
+Usa `GET /log` para consultarlo desde el cliente o `DELETE /log` para vaciarlo.
+
+---
+
 ## Cómo funciona
 
 ```
+GET/PUT /configuration
+        │
+        ▼
+  loyalty_server.py → config_handler.py
+        ├─ GET → devuelve VERSION + CONFIG + paths()
+        └─ PUT → actualiza CONFIG en memoria, devuelve estado actualizado
+
+─────────────────────────────────────────────
+
+GET/DELETE /log
+        │
+        ▼
+  loyalty_server.py → log_handler.py
+        ├─ GET    → lee server.log, retorna array JSON (más reciente primero)
+        └─ DELETE → vacía server.log
+
+─────────────────────────────────────────────
+
 App → GET /<base>/users/me/loyalty/status
         │
         ▼

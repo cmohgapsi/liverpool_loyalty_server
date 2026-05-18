@@ -21,6 +21,7 @@ class EnrollHandlerMixin:
 
             length = int(self.headers.get("Content-Length", 0))
             body = json.loads(self.rfile.read(length).decode("utf-8")) if length > 0 else {}
+            self._request_body = body
 
             print(f"📨  POST {self.path}  [loyaltyStatus={loyalty_status}]")
 
@@ -62,6 +63,14 @@ class EnrollHandlerMixin:
         prev_status, prev_action = read_current_status(current)
         _update_current_state(current, body)
         print(f"✅  current_state.json actualizado → enrolled / displayWelcomeModal")
+        self._log_extras = {
+            "prev_status": prev_status,
+            "prev_action": prev_action,
+            "operation":   "ENROLL",
+            "action":      "enroll",
+            "new_status":  "ENROLLED",
+            "new_action":  "DISPLAYWELCOMEMODAL",
+        }
         print_operation_result(prev_status, prev_action, "ENROLL", "enroll", "ENROLLED", "DISPLAYWELCOMEMODAL")
 
         self._respond(200, {
@@ -85,6 +94,14 @@ class EnrollHandlerMixin:
         prev_status, prev_action = read_current_status(current)
         _update_loyalty_data(current)
         print(f"✅  current_state.json actualizado → enrolled / displayWelcomeModal")
+        self._log_extras = {
+            "prev_status": prev_status,
+            "prev_action": prev_action,
+            "operation":   "ENROLL",
+            "action":      "reenroll",
+            "new_status":  "ENROLLED",
+            "new_action":  "DISPLAYWELCOMEMODAL",
+        }
         print_operation_result(prev_status, prev_action, "ENROLL", "reenroll", "ENROLLED", "DISPLAYWELCOMEMODAL")
 
         self._respond(200, {
