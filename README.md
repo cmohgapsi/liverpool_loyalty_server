@@ -338,6 +338,11 @@ Recibe un body JSON con `action` y `value`, aplica la transición de estado corr
 { "action": "<action>", "value": true }
 ```
 
+> **Regla especial — `unenroll`:** el body debe incluir además el campo `cancelReason` (string). Si no se recibe, el servidor responde 400:
+> ```json
+> { "status": { "status": "ERROR", "statusCode": 400, "successMessage": "cancelReason do not received" } }
+> ```
+
 **Escenarios disponibles:**
 
 | `action` | `value` | Estado siguiente | Respuesta |

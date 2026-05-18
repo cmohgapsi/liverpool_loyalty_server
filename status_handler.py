@@ -81,6 +81,16 @@ class StatusHandlerMixin:
 
             print(f"📨  PATCH {self.path} → action='{action}', value={value}")
 
+            if action == "unenroll" and not isinstance(data.get("cancelReason"), str):
+                print(f"⚠️  400 PATCH {self.path} — campo 'cancelReason' faltante o inválido")
+                print()
+                self._respond(400, {"status": {
+                    "status": "ERROR",
+                    "statusCode": 400,
+                    "successMessage": "cancelReason do not received"
+                }})
+                return
+
             if key not in SCENARIOS:
                 print("⚪  Sin escenario coincidente — retornando 200 vacío")
                 self._respond(200, {
