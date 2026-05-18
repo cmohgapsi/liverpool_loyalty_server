@@ -363,35 +363,44 @@ function showLogDetail(index) {
   const entry = logEntries[index];
   if (!entry) return;
 
+  const CODE_FIELDS = new Set(["curl", "response"]);
+
   const rows = Object.entries(entry)
-    .filter(([k]) => k !== "curl")
+    .filter(([k]) => !CODE_FIELDS.has(k))
     .map(([k, v]) => `
       <div class="detail-row">
         <span class="detail-key">${k}</span>
         <span class="detail-val">${v != null ? String(v) : "—"}</span>
       </div>`).join("");
 
-  const curlSection = entry.curl
-    ? `<div class="detail-curl-section">
-        <div class="detail-curl-label">curl</div>
-        <div class="detail-curl-wrap">
-          <pre class="detail-curl">${entry.curl.replace(/</g, "&lt;")}</pre>
-          <button class="copy-btn" id="copy-curl-btn">Copiar</button>
-        </div>
-      </div>`
-    : "";
+  const makeCodeSection = (label, text, id) => `
+    <div class="detail-curl-section">
+      <div class="detail-curl-label">${label}</div>
+      <div class="detail-curl-wrap">
+        <pre class="detail-curl">${text.replace(/</g, "&lt;")}</pre>
+        <button class="copy-btn" id="${id}">Copiar</button>
+      </div>
+    </div>`;
 
-  document.getElementById("log-detail-body").innerHTML = rows + curlSection;
+  const responseText = entry.response != null
+    ? JSON.stringify(entry.response, null, 2)
+    : null;
 
-  if (entry.curl) {
-    document.getElementById("copy-curl-btn").addEventListener("click", function () {
-      navigator.clipboard.writeText(entry.curl).then(() => {
+  const curlSection     = entry.curl     ? makeCodeSection("curl",     entry.curl,  "copy-curl-btn")     : "";
+  const responseSection = responseText   ? makeCodeSection("response", responseText, "copy-response-btn") : "";
+
+  document.getElementById("log-detail-body").innerHTML = rows + curlSection + responseSection;
+
+  const attachCopy = (btnId, text) => {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      navigator.clipboard.writeText(text).then(() => {
         this.textContent = "✓ Copiado";
         setTimeout(() => { this.textContent = "Copiar"; }, 2000);
       }).catch(() => {
-        // fallback para browsers sin clipboard API
         const ta = document.createElement("textarea");
-        ta.value = entry.curl;
+        ta.value = text;
         document.body.appendChild(ta);
         ta.select();
         document.execCommand("copy");
@@ -400,7 +409,10 @@ function showLogDetail(index) {
         setTimeout(() => { this.textContent = "Copiar"; }, 2000);
       });
     });
-  }
+  };
+
+  attachCopy("copy-curl-btn",     entry.curl || "");
+  attachCopy("copy-response-btn", responseText || "");
 
   document.getElementById("log-detail-modal").classList.add("visible");
 }

@@ -130,6 +130,7 @@ class LoyaltyHandler(EventsHandlerMixin, ConfigHandlerMixin, LogHandlerMixin, Co
             self.path,
             code,
             getattr(self, "_request_body", None),
+            response=payload,
             **getattr(self, "_log_extras", {}),
         )
         push_log_entry(entry)
