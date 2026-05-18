@@ -52,6 +52,21 @@ const ACTION_LABEL = {
 };
 const GENDER_LABEL = { male: "Masculino", female: "Femenino", M: "Masculino", F: "Femenino" };
 
+// ── Normalización de valores del log (almacenados en MAYÚSCULAS) ─────────────
+const STATUS_KEY = {
+  ENROLLED:    "enrolled",
+  NOTENROLLED: "notEnrolled",
+  UNENROLLED:  "unenrolled",
+  DECLINED:    "declined",
+};
+const ACTION_KEY = {
+  NONE:                "none",
+  DISPLAYWELCOMEMODAL: "displayWelcomeModal",
+  DISPLAYENROLLMODAL:  "displayEnrollModal",
+};
+const toStatusKey = v => STATUS_KEY[v] ?? (v ? v.toLowerCase() : null);
+const toActionKey = v => ACTION_KEY[v] ?? (v ? v.toLowerCase() : null);
+
 // ── Estado local ──────────────────────────────────────────────────────────────
 let config      = null;
 let panelOpen   = false;
@@ -293,14 +308,16 @@ function renderLogPanel() {
 
     let transitionHtml = "";
     if (hasOp) {
-      const prev = [entry.prev_status, entry.prev_action].filter(Boolean).join(" / ");
-      const next = [entry.new_status,  entry.new_action ].filter(Boolean).join(" / ");
-      const op   = entry.action || entry.operation || "";
+      const op = entry.action || entry.operation || "";
+      const prevStatusBadge = statusBadge(toStatusKey(entry.prev_status));
+      const prevActionBadge = actionBadge(toActionKey(entry.prev_action));
+      const nextStatusBadge = statusBadge(toStatusKey(entry.new_status));
+      const nextActionBadge = actionBadge(toActionKey(entry.new_action));
       transitionHtml = `
         <div class="log-transition">
-          <div class="log-state next">${next || "—"}</div>
+          <div class="log-state next">${nextStatusBadge}${nextActionBadge}</div>
           <div class="log-arrow-down">↑ <span class="log-op-name">${op}</span></div>
-          <div class="log-state prev">${prev || "—"}</div>
+          <div class="log-state prev">${prevStatusBadge}${prevActionBadge}</div>
         </div>`;
     }
 
