@@ -1,6 +1,6 @@
 const BASE_URL = "http://localhost:9876";
 
-// ── Definición de campos configurables (deducido de .env-example) ─────────────
+// ── Definición de campos configurables ────────────────────────────────────────
 const FIELD_DEFS = [
   {
     key:     "TARGET_BASE_PATH",
@@ -53,8 +53,10 @@ const ACTION_LABEL = {
 const GENDER_LABEL = { male: "Masculino", female: "Femenino", M: "Masculino", F: "Femenino" };
 
 // ── Estado local ──────────────────────────────────────────────────────────────
-let config = null;   // último config recibido del servidor
-let panelOpen = false;
+let config      = null;
+let panelOpen   = false;
+let logPanelOpen = false;
+let logEntries  = [];   // entradas filtradas (sin /log ni /configuration)
 
 // ── Render helpers ────────────────────────────────────────────────────────────
 function field(label, value, cls = "") {
@@ -149,7 +151,6 @@ function attachFormListeners() {
 
 // ── Config panel ──────────────────────────────────────────────────────────────
 function renderConfigPanel(cfg) {
-  // Servidor (solo lectura)
   document.getElementById("panel-server").innerHTML = [
     ["Versión", cfg.version],
     ["Puerto",  cfg.PORT],
@@ -159,7 +160,6 @@ function renderConfigPanel(cfg) {
       <span class="info-val">${v ?? "—"}</span>
     </div>`).join("");
 
-  // Formulario de variables editables
   const form = document.getElementById("panel-form");
   form.innerHTML = FIELD_DEFS.map(def => {
     const current = cfg[def.key] ?? "";
@@ -183,7 +183,6 @@ function renderConfigPanel(cfg) {
   attachFormListeners();
   checkDirty();
 
-  // Paths activos (solo lectura)
   const paths = cfg.paths ?? {};
   document.getElementById("panel-paths").innerHTML = Object.entries(paths)
     .map(([k, v]) => `
@@ -193,7 +192,6 @@ function renderConfigPanel(cfg) {
       </div>`).join("");
 }
 
-// ── Toggle panel ──────────────────────────────────────────────────────────────
 function togglePanel() {
   panelOpen = !panelOpen;
   document.getElementById("config-panel").classList.toggle("open", panelOpen);
@@ -263,6 +261,190 @@ async function fetchStatus() {
 
 function refreshStatus() { fetchStatus(); }
 
+// ── Log panel ─────────────────────────────────────────────────────────────────
+const LOG_SKIP = new Set(["/log", "/configuration"]);
+
+function shouldShowEntry(entry) {
+  const path = (entry.path || "").split("?")[0];
+  return !LOG_SKIP.has(path) && !path.startsWith("/events");
+}
+
+function formatLogTime(iso) {
+  const d = new Date(iso);
+  return (
+    String(d.getHours()).padStart(2, "0") + ":" +
+    String(d.getMinutes()).padStart(2, "0") + ":" +
+    String(d.getSeconds()).padStart(2, "0")
+  );
+}
+
+function renderLogPanel() {
+  const container = document.getElementById("log-entries");
+  if (logEntries.length === 0) {
+    container.innerHTML = `<div class="log-empty">Sin operaciones registradas</div>`;
+    return;
+  }
+
+  const html = logEntries.map((entry, i) => {
+    const hasOp     = entry.new_status != null;
+    const code      = entry.http_code;
+    const codeClass = code >= 200 && code < 300 ? "ok" : code >= 400 ? "err" : "warn";
+    const time      = formatLogTime(entry.request_datetime);
+
+    let transitionHtml = "";
+    if (hasOp) {
+      const prev = [entry.prev_status, entry.prev_action].filter(Boolean).join(" / ");
+      const next = [entry.new_status,  entry.new_action ].filter(Boolean).join(" / ");
+      const op   = entry.action || entry.operation || "";
+      transitionHtml = `
+        <div class="log-transition">
+          <div class="log-state prev">${prev || "—"}</div>
+          <div class="log-arrow-down">↓ <span class="log-op-name">${op}</span></div>
+          <div class="log-state next">${next || "—"}</div>
+        </div>`;
+    }
+
+    const sep = i < logEntries.length - 1
+      ? `<div class="log-separator">↑</div>`
+      : "";
+
+    return `
+      <div class="log-entry">
+        <div class="log-entry-header">
+          <span class="log-time">${time}</span>
+          <span class="log-method">${entry.method}</span>
+          <span class="log-code ${codeClass}">${code}</span>
+          <button class="log-info-btn" data-idx="${i}" title="Ver detalle">i</button>
+        </div>
+        <div class="log-path">${entry.path}</div>
+        ${transitionHtml}
+      </div>
+      ${sep}`;
+  }).join("");
+
+  container.innerHTML = html;
+
+  // Attach info button listeners (avoids escaping issues with onclick attribute)
+  container.querySelectorAll(".log-info-btn").forEach(btn => {
+    btn.addEventListener("click", () => showLogDetail(Number(btn.dataset.idx)));
+  });
+}
+
+function toggleLogPanel() {
+  logPanelOpen = !logPanelOpen;
+  document.getElementById("log-panel").classList.toggle("open", logPanelOpen);
+  document.getElementById("log-backdrop").classList.toggle("visible", logPanelOpen);
+  document.getElementById("btn-log").classList.toggle("active", logPanelOpen);
+}
+
+async function clearLog() {
+  try {
+    await fetch(`${BASE_URL}/log`, { method: "DELETE" });
+    logEntries = [];
+    renderLogPanel();
+  } catch (e) {
+    console.error("Error clearing log:", e);
+  }
+}
+
+async function fetchLog() {
+  try {
+    const res  = await fetch(`${BASE_URL}/log`);
+    const data = await res.json();
+    logEntries = data.filter(shouldShowEntry);
+    renderLogPanel();
+  } catch (e) {
+    console.error("Error fetching log:", e);
+  }
+}
+
+// ── Modal detalle ─────────────────────────────────────────────────────────────
+function showLogDetail(index) {
+  const entry = logEntries[index];
+  if (!entry) return;
+
+  const rows = Object.entries(entry)
+    .filter(([k]) => k !== "curl")
+    .map(([k, v]) => `
+      <div class="detail-row">
+        <span class="detail-key">${k}</span>
+        <span class="detail-val">${v != null ? String(v) : "—"}</span>
+      </div>`).join("");
+
+  const curlSection = entry.curl
+    ? `<div class="detail-curl-section">
+        <div class="detail-curl-label">curl</div>
+        <div class="detail-curl-wrap">
+          <pre class="detail-curl">${entry.curl.replace(/</g, "&lt;")}</pre>
+          <button class="copy-btn" id="copy-curl-btn">Copiar</button>
+        </div>
+      </div>`
+    : "";
+
+  document.getElementById("log-detail-body").innerHTML = rows + curlSection;
+
+  if (entry.curl) {
+    document.getElementById("copy-curl-btn").addEventListener("click", function () {
+      navigator.clipboard.writeText(entry.curl).then(() => {
+        this.textContent = "✓ Copiado";
+        setTimeout(() => { this.textContent = "Copiar"; }, 2000);
+      }).catch(() => {
+        // fallback para browsers sin clipboard API
+        const ta = document.createElement("textarea");
+        ta.value = entry.curl;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        this.textContent = "✓ Copiado";
+        setTimeout(() => { this.textContent = "Copiar"; }, 2000);
+      });
+    });
+  }
+
+  document.getElementById("log-detail-modal").classList.add("visible");
+}
+
+function closeLogDetail() {
+  document.getElementById("log-detail-modal").classList.remove("visible");
+}
+
+document.getElementById("log-detail-modal").addEventListener("click", function (e) {
+  if (e.target === this) closeLogDetail();
+});
+
+// ── SSE ───────────────────────────────────────────────────────────────────────
+function connectSSE() {
+  const indicator = document.getElementById("sse-indicator");
+  const es = new EventSource(`${BASE_URL}/events`);
+
+  es.onopen = () => {
+    indicator.className = "sse-dot connected";
+    indicator.title = "Push activo";
+  };
+  es.onerror = () => {
+    indicator.className = "sse-dot disconnected";
+    indicator.title = "Push desconectado — reconectando…";
+  };
+
+  es.addEventListener("log-entry", (e) => {
+    const entry = JSON.parse(e.data);
+    if (shouldShowEntry(entry)) {
+      logEntries.unshift(entry);
+      renderLogPanel();
+    }
+    // Auto-refrescar status cuando hay un cambio de estado
+    if (entry.new_status != null || (entry.method === "POST" && entry.http_code === 200)) {
+      fetchStatus();
+    }
+  });
+
+  es.addEventListener("log-cleared", () => {
+    logEntries = [];
+    renderLogPanel();
+  });
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
@@ -274,7 +456,8 @@ async function init() {
     renderHeaderError(`No se pudo cargar la configuración (${err.message})`);
     return;
   }
-  await fetchStatus();
+  await Promise.all([fetchStatus(), fetchLog()]);
+  connectSSE();
 }
 
 init();

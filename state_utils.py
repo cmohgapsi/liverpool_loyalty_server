@@ -38,7 +38,7 @@ def build_curl(method: str, host: str, port: int, path: str, body: dict | None =
 
 
 def log_request(method: str, host: str, port: int, path: str,
-                http_code: int, body: dict | None = None, **extras):
+                http_code: int, body: dict | None = None, **extras) -> dict:
     entry = {
         "method":           method,
         "path":             path,
@@ -49,6 +49,7 @@ def log_request(method: str, host: str, port: int, path: str,
     }
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    return entry
 
 
 def print_operation_result(prev_status: str, prev_action: str,

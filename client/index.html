@@ -23,6 +23,16 @@
       Actualizar
     </button>
 
+    <span id="sse-indicator" class="sse-dot" title="Push desconectado"></span>
+
+    <button id="btn-log" class="hdr-btn" onclick="toggleLogPanel()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/>
+        <line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>
+      </svg>
+      Log
+    </button>
+
     <button id="btn-config" class="hdr-btn" onclick="togglePanel()">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
@@ -43,10 +53,29 @@
     </div>
   </main>
 
-  <!-- ── Backdrop ── -->
+  <!-- ── Log backdrop ── -->
+  <div id="log-backdrop" onclick="toggleLogPanel()"></div>
+
+  <!-- ── Log panel (izquierdo) ── -->
+  <aside id="log-panel">
+    <div class="panel-header">
+      <div class="panel-header-group">
+        <h2>Log</h2>
+      </div>
+      <div class="panel-header-group">
+        <button class="log-clear-btn" onclick="clearLog()">Limpiar</button>
+        <button class="panel-close" onclick="toggleLogPanel()">✕</button>
+      </div>
+    </div>
+    <div class="log-body" id="log-entries">
+      <div class="log-empty">Sin operaciones registradas</div>
+    </div>
+  </aside>
+
+  <!-- ── Config backdrop ── -->
   <div id="panel-backdrop" onclick="togglePanel()"></div>
 
-  <!-- ── Config panel ── -->
+  <!-- ── Config panel (derecho) ── -->
   <aside id="config-panel">
     <div class="panel-header">
       <h2>Configuración</h2>
@@ -54,19 +83,14 @@
     </div>
 
     <div class="panel-body">
-      <!-- Servidor -->
       <section>
         <div class="panel-section-title">Servidor</div>
         <div id="panel-server"></div>
       </section>
-
-      <!-- Variables editables -->
       <section>
         <div class="panel-section-title">Variables</div>
         <div id="panel-form" style="display:flex;flex-direction:column;gap:14px;"></div>
       </section>
-
-      <!-- Paths activos -->
       <section>
         <div class="panel-section-title">Paths activos</div>
         <div id="panel-paths"></div>
@@ -79,6 +103,17 @@
       <div id="apply-feedback"></div>
     </div>
   </aside>
+
+  <!-- ── Modal detalle de request ── -->
+  <div id="log-detail-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">Detalle del request</span>
+        <button class="modal-close" onclick="closeLogDetail()">✕</button>
+      </div>
+      <div class="modal-body" id="log-detail-body"></div>
+    </div>
+  </div>
 
   <script src="index.js"></script>
 </body>

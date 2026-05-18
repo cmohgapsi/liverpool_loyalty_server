@@ -11,10 +11,12 @@ Uso:
 import json
 import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from socketserver import ThreadingMixIn
 
 from state_utils import load_env, log_request
 from config_handler import CONFIG, VERSION, CONFIGURATION_PATH, _paths, ConfigHandlerMixin
 from log_handler import LogHandlerMixin
+from events_handler import EventsHandlerMixin, push_log_entry
 from coupons_handler import CouponsHandlerMixin
 from enroll_handler import EnrollHandlerMixin
 from status_handler import StatusHandlerMixin
@@ -27,10 +29,15 @@ RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
 PORT           = int(_env.get("PORT", 9876))
 LOG_PATH       = "/log"
+EVENTS_PATH    = "/events"
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-class LoyaltyHandler(ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    daemon_threads = True
+
+
+class LoyaltyHandler(EventsHandlerMixin, ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -40,6 +47,9 @@ class LoyaltyHandler(ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, E
     def do_GET(self):
         path = self.path.split("?")[0]
         p = _paths()
+        if path == EVENTS_PATH:
+            self._handle_get_events()
+            return
         if path == CONFIGURATION_PATH:
             self._handle_get_configuration()
             return
@@ -114,7 +124,7 @@ class LoyaltyHandler(ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, E
         self._send_cors_headers()
         self.end_headers()
         self.wfile.write(body)
-        log_request(
+        entry = log_request(
             self.command,
             *self.server.server_address,
             self.path,
@@ -122,6 +132,7 @@ class LoyaltyHandler(ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, E
             getattr(self, "_request_body", None),
             **getattr(self, "_log_extras", {}),
         )
+        push_log_entry(entry)
 
     def log_message(self, *args):
         pass  # silencia logs HTTP del servidor
@@ -129,7 +140,7 @@ class LoyaltyHandler(ConfigHandlerMixin, LogHandlerMixin, CouponsHandlerMixin, E
 
 # ── Entry point ───────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-    server = HTTPServer(("localhost", PORT), LoyaltyHandler)
+    server = ThreadingHTTPServer(("localhost", PORT), LoyaltyHandler)
     p = _paths()
     print(f"🚀  Loyalty server corriendo en http://localhost:{PORT}  [v{VERSION}]")
     print(f"🗂️   Base path:  /{CONFIG['TARGET_BASE_PATH']}")
@@ -137,6 +148,7 @@ if __name__ == "__main__":
     print(f"📁  Responses: {RESPONSES_PATH}")
     print(f"🌐  GET    {CONFIGURATION_PATH}")
     print(f"🌐  GET    {LOG_PATH}")
+    print(f"🌐  GET    {EVENTS_PATH}  (SSE — push de eventos)")
     print(f"🌐  PUT    {CONFIGURATION_PATH}")
     print(f"🌐  DELETE {LOG_PATH}")
     print(f"🌐  GET   {p['status']}")
