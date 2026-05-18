@@ -14,6 +14,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 
 from state_utils import load_env
 from coupons_handler import CouponsHandlerMixin
+from enroll_handler import EnrollHandlerMixin
 from status_handler import StatusHandlerMixin
 
 # ─── Configuración ────────────────────────────────────────────────────────────
@@ -23,13 +24,18 @@ STATES_PATH    = os.path.join(BASE_PATH, "states")
 RESPONSES_PATH = os.path.join(BASE_PATH, "responses")
 CURRENT        = os.path.join(STATES_PATH, "current_state.json")
 PORT                = int(_env.get("PORT", 9876))
-COUPONS_LIST_SUFFIX = _env.get("COUPONS_LIST_SUFFIX", "empty")
-TARGET_PATH         = _env.get("TARGET_PATH",         "/pocket-bff/users/me/loyalty/status")
-TARGET_COUPONS_PATH = _env.get("TARGET_COUPONS_PATH", "/pocket-bff/loyalty/coupons")
+COUPONS_LIST_SUFFIX     = _env.get("COUPONS_LIST_SUFFIX",     "empty")
+COUPONS_REDEEMED_SUFFIX = _env.get("COUPONS_REDEEMED_SUFFIX", "empty")
+TARGET_PATH             = _env.get("TARGET_PATH",             "/pocket-bff/users/me/loyalty/status")
+TARGET_COUPONS_PATH     = _env.get("TARGET_COUPONS_PATH",     "/pocket-bff/users/me/loyalty/coupons")
+TARGET_REDEEMED_PATH    = _env.get("TARGET_REDEEMED_PATH",    "/pocket-bff/users/me/loyalty/coupons/redeemed")
+TARGET_ENROLL_PATH      = _env.get("TARGET_ENROLL_PATH",      "/pocket-bff/users/me/loyalty/enroll")
+LOYALTY_MEMBER_ID       = _env.get("LOYALTY_MEMBER_ID",       "720100015844")
+USER_ID                 = int(_env.get("USER_ID",              2465729859))
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-class LoyaltyHandler(CouponsHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
+class LoyaltyHandler(CouponsHandlerMixin, EnrollHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -37,6 +43,9 @@ class LoyaltyHandler(CouponsHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHan
         self.end_headers()
 
     def do_GET(self):
+        if self.path == TARGET_REDEEMED_PATH:
+            self._handle_get_redeemed(RESPONSES_PATH, COUPONS_REDEEMED_SUFFIX)
+            return
         if self.path == TARGET_COUPONS_PATH:
             self._handle_get_coupons(RESPONSES_PATH, COUPONS_LIST_SUFFIX)
             return
@@ -44,6 +53,12 @@ class LoyaltyHandler(CouponsHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHan
             self._not_found()
             return
         self._handle_get_status(CURRENT)
+
+    def do_POST(self):
+        if self.path != TARGET_ENROLL_PATH:
+            self._not_found()
+            return
+        self._handle_post_enroll(CURRENT, LOYALTY_MEMBER_ID, USER_ID)
 
     def do_PATCH(self):
         if self.path != TARGET_PATH:
@@ -62,7 +77,7 @@ class LoyaltyHandler(CouponsHandlerMixin, StatusHandlerMixin, BaseHTTPRequestHan
 
     def _send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, PATCH, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PATCH, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, x-correlation-id")
 
     def _respond(self, code, payload):
@@ -87,8 +102,11 @@ if __name__ == "__main__":
     print(f"🚀  Loyalty server corriendo en http://localhost:{PORT}")
     print(f"📁  States:    {STATES_PATH}")
     print(f"📁  Responses: {RESPONSES_PATH}")
-    print(f"🌐  TARGET_PATH         = {TARGET_PATH}")
-    print(f"🌐  TARGET_COUPONS_PATH = {TARGET_COUPONS_PATH}")
+    print(f"🌐  GET  {TARGET_PATH}")
+    print(f"🌐  GET  {TARGET_COUPONS_PATH}  [suffix={COUPONS_LIST_SUFFIX}]")
+    print(f"🌐  GET  {TARGET_REDEEMED_PATH}  [suffix={COUPONS_REDEEMED_SUFFIX}]")
+    print(f"🌐  POST  {TARGET_ENROLL_PATH}")
+    print(f"🌐  PATCH {TARGET_PATH}")
     print(f"     Configura en Proxyman: Map Remote")
     print(f"     ANY ...pocket-bff/users/me/loyalty/*  →  http://localhost:{PORT}/pocket-bff/users/me/loyalty/*")
     print("     Presiona Ctrl+C para detener\n")

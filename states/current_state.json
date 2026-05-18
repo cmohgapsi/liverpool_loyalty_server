@@ -40,7 +40,8 @@ Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
   "dateOfBirth": "12/10/1989",
   "monederoAccNumber": 8790003681888,
   "loyaltyData": {
-    "action": "displayEnrollModal",
-    "status": "notEnrolled"
+    "action": "displayWelcomeModal",
+    "status": "enrolled",
+    "memberSince": "2026-05-18"
   }
 }
