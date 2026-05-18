@@ -298,9 +298,9 @@ function renderLogPanel() {
       const op   = entry.action || entry.operation || "";
       transitionHtml = `
         <div class="log-transition">
-          <div class="log-state prev">${prev || "—"}</div>
-          <div class="log-arrow-down">↓ <span class="log-op-name">${op}</span></div>
           <div class="log-state next">${next || "—"}</div>
+          <div class="log-arrow-down">↑ <span class="log-op-name">${op}</span></div>
+          <div class="log-state prev">${prev || "—"}</div>
         </div>`;
     }
 
