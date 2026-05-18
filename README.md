@@ -2,10 +2,11 @@
 
 Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
 
-Atiende siete endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
+Atiende ocho endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
 
 | Método | Path | Descripción |
 |---|---|---|
+| `GET` | `/configuration` | Devuelve la configuración activa del servidor |
 | `GET` | `/<base>/users/me/loyalty/status` | Devuelve `current_state.json` |
 | `GET` | `/<base>/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
 | `GET` | `/<base>/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
@@ -74,6 +75,7 @@ cp .env-example .env
 ```
 
 ```env
+VERSION=1.0.0
 BASE_PATH=/ruta/absoluta/a/decommission
 PORT=9876
 TARGET_BASE_PATH=pocket-bff
@@ -86,6 +88,7 @@ CHECKOUT_COUPONS_SUFFIX=cart
 
 | Variable | Valores | Descripción |
 |---|---|---|
+| `VERSION` | string | Versión del servidor, visible en el startup log y en `/configuration`. |
 | `BASE_PATH` | ruta absoluta | Ruta a la carpeta `decommission/`. Ajústala si mueves el proyecto. |
 | `PORT` | `9876` | Puerto del servidor local. |
 | `TARGET_BASE_PATH` | `pocket-bff` · `web-bff` | Prefijo base de todos los endpoints. Cambia este valor para apuntar a un BFF distinto. |
@@ -136,7 +139,7 @@ python3 /ruta/a/decommission/loyalty_server.py
 Salida esperada (con `TARGET_BASE_PATH=pocket-bff`):
 
 ```
-🚀  Loyalty server corriendo en http://localhost:9876
+🚀  Loyalty server corriendo en http://localhost:9876  [v1.0.0]
 🗂️   Base path:  /pocket-bff
 📁  States:    …/states
 📁  Responses: …/responses
@@ -147,6 +150,7 @@ Salida esperada (con `TARGET_BASE_PATH=pocket-bff`):
 🌐  GET  /pocket-bff/loyalty/cancel-reasons
 🌐  POST  /pocket-bff/users/me/loyalty/enroll
 🌐  PATCH /pocket-bff/users/me/loyalty/status
+🌐  GET  /configuration
 ```
 
 > Mantén esta terminal abierta durante toda la sesión de prueba.
@@ -171,6 +175,39 @@ Esto permite mantener variantes por entorno sin modificar los archivos base.
 ---
 
 ## Endpoints
+
+### GET `/configuration`
+
+Devuelve la configuración activa cargada desde `.env`. No requiere base path ni parámetros.
+
+```json
+{
+  "version": "1.0.0",
+  "TARGET_BASE_PATH": "pocket-bff",
+  "COUPONS_LIST_SUFFIX": "full",
+  "COUPONS_REDEEMED_SUFFIX": "full",
+  "CHECKOUT_COUPONS_SUFFIX": "cart",
+  "LOYALTY_MEMBER_ID": "720100015844",
+  "USER_ID": 2465729859,
+  "PORT": 9876,
+  "paths": {
+    "status":          "/pocket-bff/users/me/loyalty/status",
+    "coupons":         "/pocket-bff/users/me/loyalty/coupons",
+    "redeemed":        "/pocket-bff/users/me/loyalty/coupons/redeemed",
+    "enroll":          "/pocket-bff/users/me/loyalty/enroll",
+    "checkoutCoupons": "/pocket-bff/checkout/coupons",
+    "cancelReasons":   "/pocket-bff/loyalty/cancel-reasons",
+    "configuration":   "/configuration"
+  }
+}
+```
+
+```
+📨  GET /configuration
+📤  Retornando configuración del servidor
+```
+
+---
 
 ### GET `/<base>/users/me/loyalty/status`
 
