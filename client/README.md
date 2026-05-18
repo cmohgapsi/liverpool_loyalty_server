@@ -31,9 +31,7 @@ Cambia `BASE_URL` si el servidor corre en un puerto distinto. El `TARGET_BASE_PA
 
 ---
 
-## Pantalla principal
-
-### Header sticky
+## Header sticky
 
 Siempre visible en la parte superior. Muestra de un vistazo el estado de la membresía actual:
 
@@ -43,23 +41,68 @@ Siempre visible en la parte superior. Muestra de un vistazo el estado de la memb
 | Badge de acción | Acción pendiente del servidor (`none`, `displayWelcomeModal`, `displayEnrollModal`) |
 | Miembro desde | Fecha de alta en el programa de lealtad |
 | Nombre del usuario | `firstName` + `lastName` del estado actual |
+| **Actualizar** | Recarga el estado desde `GET /<base>/users/me/loyalty/status` |
+| Punto SSE | Círculo verde = push activo · rojo = desconectado (reconectando) |
+| **Log** | Abre/cierra el panel de log (izquierdo) |
+| **Config** | Abre/cierra el panel de configuración (derecho) |
 
-El botón **Actualizar** recarga el estado desde `GET /<base>/users/me/loyalty/status`.
+---
 
-### Card — Estado de Lealtad
+## Panel de log
 
-Muestra los campos de `loyaltyData`: estado, acción y fecha de membresía.
+Se abre y cierra con el botón **Log** del header (resaltado en azul cuando está visible). También se puede cerrar con el backdrop o el botón **✕**.
 
-### Card — Datos del Usuario
+### Entradas mostradas
 
-Muestra los campos personales del `current_state.json`: nombre, apellidos, género, email, fecha de nacimiento, ID de repositorio y número de monedero.
+El panel muestra todas las operaciones registradas excepto `GET /log` y `GET /configuration` (que son lecturas internas del propio cliente). Las entradas se ordenan de **más reciente a más antigua** (la operación más nueva aparece arriba).
+
+### Formato de cada entrada
+
+```
+14:32:05  PATCH  200  [i]
+/web-bff/users/me/loyalty/status
+
+ENROLLED / NONE          ← estado resultante
+↑ welcomeModalClosed     ← operación
+ENROLLED / DISPLAYWELCOMEMODAL   ← estado previo
+```
+
+Para operaciones sin transición de estado (p. ej. GET /status) solo se muestra la línea de cabecera y el path.
+
+### Separador entre entradas
+
+Un `↑` separa cada par de entradas consecutivas, indicando que el tiempo fluye hacia arriba.
+
+### Botón de detalle `i`
+
+Abre un modal con todos los campos del log entry y el curl reproducible:
+
+```bash
+curl -X PATCH "http://localhost:9876/web-bff/users/me/loyalty/status" \
+  -H "Content-Type: application/json" \
+  -d '{"action": "welcomeModalClosed", "value": true}'
+```
+
+El botón **Copiar** copia el curl al portapapeles.
+
+### Limpiar
+
+El botón **Limpiar** envía `DELETE /log`. El servidor vacía `server.log` y emite el evento SSE `log-cleared`, que limpia la vista del panel inmediatamente.
+
+### Push en tiempo real (SSE)
+
+Al arrancar, el cliente abre una conexión `GET /events` con el servidor. Cada operación que el servidor procesa notifica al cliente vía SSE sin necesidad de polling:
+
+- **`log-entry`** — el cliente prepende la nueva entrada al panel de log. Si el entry incluye `new_status` (cambio de estado) o es un POST enroll exitoso, el cliente también refresca automáticamente los cards de status.
+- **`log-cleared`** — el cliente limpia su panel de log.
+
+El punto de color en el header refleja el estado de la conexión SSE: verde = activo, rojo = desconectado (el browser reconecta automáticamente).
 
 ---
 
 ## Panel de configuración
 
-Se abre y cierra con el botón **⚙️ Config** del header (queda resaltado en azul cuando está visible).  
-También se puede cerrar haciendo clic en el backdrop semitransparente o en el botón **✕**.
+Se abre y cierra con el botón **⚙️ Config** del header (resaltado en azul cuando está visible). También se puede cerrar con el backdrop o el botón **✕**.
 
 ### Secciones del panel
 
@@ -107,18 +150,23 @@ Tras la respuesta exitosa del servidor:
 
 | Archivo | Descripción |
 |---|---|
-| `index.html` | Estructura y markup del panel |
-| `index.css` | Estilos: variables, layout, cards, panel, badges |
-| `index.js` | Lógica: fetch, render, dirty-state, panel toggle |
+| `index.html` | Estructura y markup: header, cards, panel de log, panel de config, modal |
+| `index.css` | Estilos: variables, layout, cards, paneles, log entries, modal |
+| `index.js` | Lógica: fetch, render, log panel, SSE, modal de detalle, dirty-state |
 
 ---
 
 ## Arquitectura del cliente
 
-El cliente descubre la configuración del servidor en el arranque:
+```
+init()
+  ├─ GET /configuration → paths + config → renderConfigPanel()
+  ├─ GET /<base>/status → renderHeader() + renderLoyaltyCard() + renderUserCard()
+  ├─ GET /log           → logEntries[] → renderLogPanel()
+  └─ GET /events  (SSE, conexión persistente)
+         ├─ "log-entry"   → unshift(entry) → renderLogPanel()
+         │                  si new_status → fetchStatus()
+         └─ "log-cleared" → logEntries=[] → renderLogPanel()
+```
 
-1. `GET /configuration` → obtiene `paths`, `TARGET_BASE_PATH` y todos los valores configurables.
-2. Usa `paths.status` para construir la URL del `GET /<base>/users/me/loyalty/status`.
-3. `PUT /configuration` → actualiza los valores en el servidor sin reiniciarlo; el cliente re-pinta el panel y recarga el status con los nuevos paths.
-
-De esta forma, cambiar `TARGET_BASE_PATH` desde el panel aplica inmediatamente sin tocar el código ni reiniciar el servidor.
+De esta forma, el cliente se mantiene sincronizado con el servidor sin polling: cualquier operación del servidor (desde Postman, curl o la app) actualiza el panel de log y el estado de membresía en tiempo real.

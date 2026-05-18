@@ -2,7 +2,7 @@
 
 Servidor local que intercepta llamadas redirigidas por Proxyman (Map Remote) para simular las transiciones de estado del sistema de lealtad, sin tocar ninguna regla de Proxyman en tiempo de ejecución.
 
-Atiende once endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
+Atiende doce endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE_PATH` en `.env` (`pocket-bff` o `web-bff`):
 
 | Método | Path | Descripción |
 |---|---|---|
@@ -10,6 +10,7 @@ Atiende once endpoints. El prefijo `<base>` corresponde al valor de `TARGET_BASE
 | `PUT` | `/configuration` | Actualiza en memoria los valores de configuración |
 | `GET` | `/log` | Devuelve el historial de requests (más reciente primero) |
 | `DELETE` | `/log` | Vacía el historial de requests (`server.log`) |
+| `GET` | `/events` | Stream SSE — notifica al cliente tras cada operación |
 | `GET` | `/<base>/users/me/loyalty/status` | Devuelve `current_state.json` |
 | `GET` | `/<base>/users/me/loyalty/coupons` | Devuelve lista de cupones según `COUPONS_LIST_SUFFIX` |
 | `GET` | `/<base>/users/me/loyalty/coupons/redeemed` | Devuelve cupones canjeados según `COUPONS_REDEEMED_SUFFIX` |
@@ -54,9 +55,10 @@ decommission/
 │   └── get_loyalty_cancel_reasons.json
 ├── .env                                ← Variables de entorno (no versionado, créalo desde .env-example)
 ├── .env-example                        ← Plantilla de variables de entorno
-├── loyalty_server.py                   ← Servidor local: routing y entry point
+├── loyalty_server.py                   ← Servidor local: routing, ThreadingHTTPServer, entry point
 ├── config_handler.py                   ← CONFIG, _paths(), GET/PUT /configuration (ConfigHandlerMixin)
 ├── log_handler.py                      ← GET/DELETE /log (LogHandlerMixin)
+├── events_handler.py                   ← GET /events SSE + push_log_entry() (EventsHandlerMixin)
 ├── coupons_handler.py                  ← Handler y lógica de cupones (CouponsHandlerMixin)
 ├── enroll_handler.py                   ← Handler y lógica de enrolamiento (EnrollHandlerMixin)
 ├── status_handler.py                   ← Handler y lógica de status (StatusHandlerMixin, SCENARIOS)
@@ -156,6 +158,7 @@ Salida esperada (con `TARGET_BASE_PATH=pocket-bff`):
 📁  Responses: …/responses
 🌐  GET    /configuration
 🌐  GET    /log
+🌐  GET    /events  (SSE — push de eventos)
 🌐  PUT    /configuration
 🌐  DELETE /log
 🌐  GET   /pocket-bff/users/me/loyalty/status
@@ -294,7 +297,7 @@ Devuelve un arreglo JSON con todos los requests registrados en `server.log`, ord
 
 ### DELETE `/log`
 
-Vacía el archivo `server.log`. No elimina el archivo, solo borra su contenido.
+Vacía el archivo `server.log`. No elimina el archivo, solo borra su contenido. Emite el evento SSE `log-cleared` a todos los clientes conectados para que limpien su vista de log.
 
 **Response 200:**
 ```json
@@ -304,6 +307,31 @@ Vacía el archivo `server.log`. No elimina el archivo, solo borra su contenido.
 ```
 🗑️   DELETE /log
 ✅  server.log vaciado
+```
+
+---
+
+### GET `/events`
+
+Endpoint SSE (_Server-Sent Events_). El cliente se conecta una vez y el servidor le envía eventos en tiempo real sin necesidad de polling.
+
+**Tipos de evento:**
+
+| Evento | Cuándo se emite | Payload |
+|---|---|---|
+| `log-entry` | Tras cualquier operación (excepto GET /log) | JSON del log entry completo |
+| `log-cleared` | Tras DELETE /log | `{}` |
+
+El cliente usa los eventos para:
+- Prepender nuevas entradas al panel de log sin refetch.
+- Auto-refrescar el estado de membresía cuando llega un cambio de estado (`new_status` presente) o un enroll exitoso.
+- Limpiar su panel de log al recibir `log-cleared`.
+
+El servidor mantiene la conexión viva con comentarios de keepalive cada 20 s. Si la conexión se corta, el browser reconecta automáticamente.
+
+```
+📡  SSE client conectado  (1 activo)
+📡  SSE client desconectado (0 activos)
 ```
 
 ---
@@ -586,7 +614,20 @@ GET/DELETE /log
         ▼
   loyalty_server.py → log_handler.py
         ├─ GET    → lee server.log, retorna array JSON (más reciente primero)
-        └─ DELETE → vacía server.log
+        └─ DELETE → vacía server.log + push evento "log-cleared" vía SSE
+
+─────────────────────────────────────────────
+
+GET /events  (SSE)
+        │
+        ▼
+  loyalty_server.py → events_handler.py
+        ├─ Mantiene conexión abierta (keepalive cada 20 s)
+        ├─ Cada _respond() llama push_log_entry(entry)
+        │    ├─ GET /log  → no notifica (cliente leyendo su propio log)
+        │    ├─ DELETE /log → emite evento "log-cleared"
+        │    └─ resto    → emite evento "log-entry" con el JSON del entry
+        └─ El browser reconecta automáticamente si pierde la conexión
 
 ─────────────────────────────────────────────
 
