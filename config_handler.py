@@ -59,7 +59,7 @@ class ConfigHandlerMixin:
             ignored = {}
             for key, value in body.items():
                 if key in _CONFIGURABLE:
-                    CONFIG[key] = int(value) if key == "USER_ID" else value
+                    CONFIG[key] = int(value) if key in ("USER_ID", "DELAY_MS") else value
                     updated[key] = CONFIG[key]
                 else:
                     ignored[key] = value

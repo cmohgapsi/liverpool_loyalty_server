@@ -208,6 +208,7 @@ Devuelve la configuración activa. Los valores reflejan el estado en memoria (in
   "CHECKOUT_COUPONS_SUFFIX": "cart",
   "LOYALTY_MEMBER_ID": "720100015844",
   "USER_ID": 2465729859,
+  "DELAY_MS": 0,
   "paths": {
     "status":          "/pocket-bff/users/me/loyalty/status",
     "coupons":         "/pocket-bff/users/me/loyalty/coupons",
