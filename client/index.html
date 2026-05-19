@@ -95,9 +95,13 @@
         <div class="ops-body">
           <div class="form-field">
             <label class="form-label" for="op-cancel-reason">Razón de cancelación</label>
-            <select class="form-control" id="op-cancel-reason">
+            <select class="form-control" id="op-cancel-reason" onchange="onCancelReasonChange()">
               <option value="">Cargando razones…</option>
             </select>
+          </div>
+          <div class="form-field" id="op-cancel-other-field" style="display:none">
+            <label class="form-label" for="op-cancel-other">Razón personalizada *</label>
+            <input class="form-control" id="op-cancel-other" type="text" placeholder="Escribe la razón…" />
           </div>
           <button class="ops-btn" id="btn-op-cancel" onclick="opCancelEnroll()">Ejecutar</button>
           <div class="ops-feedback" id="fb-cancel-enroll"></div>

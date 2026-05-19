@@ -510,11 +510,16 @@ async function fetchCancelReasons() {
       const val   = typeof r === "string" ? r : (r.cancelReasonId ?? r.id ?? r.code ?? JSON.stringify(r));
       const label = typeof r === "string" ? r : (r.description ?? r.name ?? r.label ?? String(val));
       return `<option value="${val}">${label}</option>`;
-    }).join("");
+    }).join("") + `<option value="__other__">Otro…</option>`;
   } catch (e) {
     select.innerHTML = `<option value="">Error al cargar razones</option>`;
     console.error("fetchCancelReasons:", e);
   }
+}
+
+function onCancelReasonChange() {
+  const isOther = document.getElementById("op-cancel-reason").value === "__other__";
+  document.getElementById("op-cancel-other-field").style.display = isOther ? "" : "none";
 }
 
 async function opSetStatus() {
@@ -539,8 +544,14 @@ async function opSetStatus() {
 }
 
 async function opCancelEnroll() {
-  const cancelReason = document.getElementById("op-cancel-reason").value;
-  if (!cancelReason) { opFeedback("fb-cancel-enroll", "Selecciona una razón", false); return; }
+  const selected = document.getElementById("op-cancel-reason").value;
+  const cancelReason = selected === "__other__"
+    ? document.getElementById("op-cancel-other").value.trim()
+    : selected;
+  if (!cancelReason) {
+    opFeedback("fb-cancel-enroll", selected === "__other__" ? "Escribe la razón personalizada" : "Selecciona una razón", false);
+    return;
+  }
   const path = config?.paths?.status;
   if (!path) { opFeedback("fb-cancel-enroll", "Config no cargada", false); return; }
   opBusy("btn-op-cancel", true);
