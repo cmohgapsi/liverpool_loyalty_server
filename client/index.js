@@ -111,15 +111,7 @@ function renderHeaderError(msg) {
     `<span id="header-error">⚠️ ${msg}</span>`;
 }
 
-// ── Cards de estado / usuario ─────────────────────────────────────────────────
-function renderLoyaltyCard(data) {
-  const l = data?.loyaltyData ?? {};
-  document.getElementById("loyalty-fields").innerHTML =
-    field("Estado",        statusBadge(l.status) + "<div style='margin-top:4px;'>" + actionBadge(l.action) + "</div>", "col-2") +
-    field("Acción",        ACTION_LABEL[l.action] ?? l.action) +
-    field("Miembro desde", l.memberSince);
-}
-
+// ── Card usuario ─────────────────────────────────────────────────
 function renderUserCard(data) {
   document.getElementById("user-fields").innerHTML =
     field("Nombre",           data?.firstName) +
@@ -210,7 +202,6 @@ function renderConfigPanel(cfg) {
 function togglePanel() {
   panelOpen = !panelOpen;
   document.getElementById("config-panel").classList.toggle("open", panelOpen);
-  document.getElementById("panel-backdrop").classList.toggle("visible", panelOpen);
   document.getElementById("btn-config").classList.toggle("active", panelOpen);
 }
 
@@ -264,7 +255,6 @@ async function fetchStatus() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderHeader(data);
-    renderLoyaltyCard(data);
     renderUserCard(data);
   } catch (err) {
     renderHeaderError(`No se pudo conectar con el servidor (${err.message})`);
@@ -350,7 +340,6 @@ function renderLogPanel() {
 function toggleLogPanel() {
   logPanelOpen = !logPanelOpen;
   document.getElementById("log-panel").classList.toggle("open", logPanelOpen);
-  document.getElementById("log-backdrop").classList.toggle("visible", logPanelOpen);
   document.getElementById("btn-log").classList.toggle("active", logPanelOpen);
 }
 

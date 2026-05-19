@@ -26,7 +26,18 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── Page body (3-column flex row) ── */
+#page-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  overflow: hidden;
 }
 
 /* ── Header sticky ── */
@@ -119,12 +130,15 @@ body {
 
 /* ── Main content ── */
 main {
-  max-width: 860px;
-  margin: 32px auto;
-  padding: 0 24px;
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 32px 24px;
   display: grid;
   gap: 20px;
-  transition: margin-right .25s;
+  align-content: start;
+  margin: 0 auto;
+  width: 100%;
 }
 
 /* ── Cards ── */
@@ -132,7 +146,6 @@ main {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
 }
 .card-title {
   padding: 14px 20px;
@@ -177,31 +190,20 @@ main {
 @keyframes shimmer { to { background-position: -400% 0; } }
 
 /* ── Config panel ── */
-#panel-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.2);
-  z-index: 199;
-}
-#panel-backdrop.visible { display: block; }
-
 #config-panel {
-  position: fixed;
-  top: 0;
-  right: 0;
-  height: 100vh;
-  width: var(--panel-w);
+  flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
   background: var(--surface);
   border-left: 1px solid var(--border);
-  box-shadow: -4px 0 20px rgba(0,0,0,.1);
-  z-index: 200;
   display: flex;
   flex-direction: column;
-  transform: translateX(100%);
-  transition: transform .25s ease;
+  transition: width .25s ease;
 }
-#config-panel.open { transform: translateX(0); }
+#config-panel.open { width: var(--panel-w); }
+#config-panel .panel-header,
+#config-panel .panel-body,
+#config-panel .panel-footer { min-width: var(--panel-w); }
 
 .panel-header {
   display: flex;
@@ -370,31 +372,19 @@ main {
 .sse-dot.disconnected { background: var(--declined); }
 
 /* ── Log panel (izquierdo) ── */
-#log-backdrop {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.2);
-  z-index: 199;
-}
-#log-backdrop.visible { display: block; }
-
 #log-panel {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: var(--log-panel-w);
+  flex-shrink: 0;
+  width: 0;
+  overflow: hidden;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  box-shadow: 4px 0 20px rgba(0,0,0,.1);
-  z-index: 200;
   display: flex;
   flex-direction: column;
-  transform: translateX(-100%);
-  transition: transform .25s ease;
+  transition: width .25s ease;
 }
-#log-panel.open { transform: translateX(0); }
+#log-panel.open { width: var(--log-panel-w); }
+#log-panel .panel-header,
+#log-panel .log-body { min-width: var(--log-panel-w); }
 
 .log-clear-btn {
   font-size: 12px;
