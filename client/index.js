@@ -474,6 +474,151 @@ function connectSSE() {
   });
 }
 
+// ── Operations ────────────────────────────────────────────────────────────────
+
+function opFeedback(id, msg, isOk) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.className = `ops-feedback ${isOk ? "ok" : "err"}`;
+  setTimeout(() => { el.textContent = ""; el.className = "ops-feedback"; }, 4000);
+}
+
+function opBusy(btnId, busy) {
+  const btn = document.getElementById(btnId);
+  if (btn) btn.disabled = busy;
+}
+
+function _findArray(obj) {
+  if (Array.isArray(obj)) return obj;
+  if (!obj || typeof obj !== "object") return null;
+  for (const v of Object.values(obj)) {
+    const found = _findArray(v);
+    if (found) return found;
+  }
+  return null;
+}
+
+async function fetchCancelReasons() {
+  const select = document.getElementById("op-cancel-reason");
+  const path   = config?.paths?.cancelReasons;
+  if (!path) { select.innerHTML = `<option value="">Config no cargada</option>`; return; }
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      headers: { "server-log": "false" },
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const arr  = _findArray(data);
+    if (!arr || arr.length === 0) {
+      select.innerHTML = `<option value="">Sin razones disponibles</option>`;
+      return;
+    }
+    select.innerHTML = arr.map(r => {
+      const val   = typeof r === "string" ? r : (r.cancelReasonId ?? r.id ?? r.code ?? JSON.stringify(r));
+      const label = typeof r === "string" ? r : (r.description ?? r.name ?? r.label ?? String(val));
+      return `<option value="${val}">${label}</option>`;
+    }).join("");
+  } catch (e) {
+    select.innerHTML = `<option value="">Error al cargar razones</option>`;
+    console.error("fetchCancelReasons:", e);
+  }
+}
+
+async function opSetStatus() {
+  const action = document.getElementById("op-status-action").value;
+  const path   = config?.paths?.status;
+  if (!path) { opFeedback("fb-set-status", "Config no cargada", false); return; }
+  opBusy("btn-op-set-status", true);
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method:  "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ action, value: true }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-set-status", "✓ Estado actualizado", true);
+  } catch (e) {
+    opFeedback("fb-set-status", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-set-status", false);
+  }
+}
+
+async function opCancelEnroll() {
+  const cancelReason = document.getElementById("op-cancel-reason").value;
+  if (!cancelReason) { opFeedback("fb-cancel-enroll", "Selecciona una razón", false); return; }
+  const path = config?.paths?.status;
+  if (!path) { opFeedback("fb-cancel-enroll", "Config no cargada", false); return; }
+  opBusy("btn-op-cancel", true);
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method:  "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ action: "unenroll", value: true, cancelReason }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-cancel-enroll", "✓ Enrolamiento cancelado", true);
+  } catch (e) {
+    opFeedback("fb-cancel-enroll", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-cancel", false);
+  }
+}
+
+async function opEnroll() {
+  const firstName      = document.getElementById("op-first-name").value.trim();
+  const lastName       = document.getElementById("op-last-name").value.trim();
+  const motherLastName = document.getElementById("op-mother-name").value.trim();
+  const gender         = document.getElementById("op-gender").value;
+  const dateOfBirth    = document.getElementById("op-dob").value.trim();
+
+  if (!firstName || !lastName || !motherLastName || !gender || !dateOfBirth) {
+    opFeedback("fb-enroll", "Todos los campos son obligatorios", false);
+    return;
+  }
+
+  const path = config?.paths?.enroll;
+  if (!path) { opFeedback("fb-enroll", "Config no cargada", false); return; }
+  opBusy("btn-op-enroll", true);
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ firstName, lastName, motherLastName, gender, dateOfBirth }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-enroll", "✓ Enrolamiento exitoso", true);
+  } catch (e) {
+    opFeedback("fb-enroll", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-enroll", false);
+  }
+}
+
+async function opReEnroll() {
+  const path = config?.paths?.enroll;
+  if (!path) { opFeedback("fb-reenroll", "Config no cargada", false); return; }
+  opBusy("btn-op-reenroll", true);
+  try {
+    const res = await fetch(`${BASE_URL}${path}`, {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({}),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-reenroll", "✓ Re-enrolamiento exitoso", true);
+  } catch (e) {
+    opFeedback("fb-reenroll", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-reenroll", false);
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
@@ -486,6 +631,7 @@ async function init() {
     return;
   }
   await Promise.all([fetchStatus(), fetchLog()]);
+  fetchCancelReasons();
   connectSSE();
 }
 

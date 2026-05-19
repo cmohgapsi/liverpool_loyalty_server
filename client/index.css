@@ -673,3 +673,65 @@ main {
   white-space: nowrap;
 }
 .copy-btn:hover { background: rgba(255,255,255,.18); }
+
+/* ── Operations section ── */
+.ops-section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.ops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.ops-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ops-btn {
+  width: 100%;
+  padding: 9px;
+  border-radius: 8px;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+  margin-top: 4px;
+}
+.ops-btn:hover    { background: var(--primary-dark); }
+.ops-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+.ops-feedback {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  min-height: 16px;
+}
+.ops-feedback.ok  { color: var(--enrolled); }
+.ops-feedback.err { color: var(--declined); }
+
+.ops-description {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.ops-description code {
+  font-family: monospace;
+  font-size: 12px;
+  background: var(--bg);
+  padding: 1px 5px;
+  border-radius: 4px;
+  color: var(--text);
+}
