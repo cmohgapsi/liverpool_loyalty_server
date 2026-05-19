@@ -251,7 +251,10 @@ async function fetchStatus() {
   try {
     const statusPath = config?.paths?.status;
     if (!statusPath) throw new Error("Configuración no cargada");
-    const res  = await fetch(`${BASE_URL}${statusPath}`);
+    const res  = await fetch(`${BASE_URL}${statusPath}`, {
+      headers: { "server-log": "false" },
+    });
+
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderHeader(data);

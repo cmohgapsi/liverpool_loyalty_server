@@ -111,7 +111,7 @@ class LoyaltyHandler(EventsHandlerMixin, ConfigHandlerMixin, LogHandlerMixin, Co
     def _send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin",  "*")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization, x-correlation-id")
+        self.send_header("Access-Control-Allow-Headers", "*")
 
     def _respond(self, code, payload):
         body = json.dumps(payload).encode("utf-8")
