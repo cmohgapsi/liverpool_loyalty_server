@@ -6,6 +6,7 @@ from state_utils import load_env
 _env = load_env(os.path.join(os.path.dirname(__file__), ".env"))
 
 VERSION = _env.get("VERSION", "0.0.0")
+PORT    = int(_env.get("PORT", 9876))
 
 CONFIG = {
     "TARGET_BASE_PATH":        _env.get("TARGET_BASE_PATH",        "pocket-bff"),
@@ -39,6 +40,7 @@ class ConfigHandlerMixin:
         print(f"📨  GET {self.path}")
         payload = {
             "version": VERSION,
+            "PORT": PORT,
             **CONFIG,
             "paths": _paths(),
         }
@@ -71,7 +73,7 @@ class ConfigHandlerMixin:
             self._respond(200, {
                 "status": {"status": "OK", "statusCode": 0},
                 "updated":       updated,
-                "configuration": {"version": VERSION, **CONFIG, "paths": _paths()},
+                "configuration": {"version": VERSION, "PORT": PORT, **CONFIG, "paths": _paths()},
             })
         except Exception as e:
             print(f"❌  Error: {e}")
