@@ -1,7 +1,7 @@
 import os
 from urllib.parse import parse_qs, urlparse
 
-from state_utils import extract_json_body, resolve_response_file
+from state_utils import extract_json_body, extract_http_status, resolve_response_file
 
 
 class CouponsHandlerMixin:
@@ -14,9 +14,9 @@ class CouponsHandlerMixin:
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
+                raw = f.read()
             print(f"📤  Retornando {filename}")
-            self._respond(200, body)
+            self._respond(extract_http_status(raw), extract_json_body(raw))
             print()
         except Exception as e:
             print(f"❌  Error: {e}")
@@ -31,9 +31,9 @@ class CouponsHandlerMixin:
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
+                raw = f.read()
             print(f"📤  Retornando {filename}")
-            self._respond(200, body)
+            self._respond(extract_http_status(raw), extract_json_body(raw))
             print()
         except Exception as e:
             print(f"❌  Error: {e}")
@@ -61,9 +61,9 @@ class CouponsHandlerMixin:
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
+                raw = f.read()
             print(f"📤  Retornando {filename}")
-            self._respond(200, body)
+            self._respond(extract_http_status(raw), extract_json_body(raw))
             print()
         except Exception as e:
             print(f"❌  Error: {e}")

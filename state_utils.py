@@ -28,6 +28,18 @@ def extract_json_body(raw: str) -> dict:
     return json.loads(raw.strip())
 
 
+def extract_http_status(raw: str) -> int:
+    """Extrae el código HTTP de la primera línea de un archivo raw HTTP (ej. HTTP/1.1 404 Not Found → 404)."""
+    first_line = raw.strip().splitlines()[0] if raw.strip() else ""
+    parts = first_line.split()
+    if len(parts) >= 2 and parts[0].startswith("HTTP/"):
+        try:
+            return int(parts[1])
+        except ValueError:
+            pass
+    return 200
+
+
 def build_curl(method: str, host: str, port: int, path: str, body: dict | None = None) -> str:
     url   = f"http://{host}:{port}{path}"
     parts = [f'curl -X {method} "{url}"']

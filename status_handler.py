@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 
-from state_utils import extract_json_body, print_operation_result, read_current_status, resolve_response_file
+from state_utils import extract_json_body, extract_http_status, print_operation_result, read_current_status, resolve_response_file
 
 
 SCENARIOS = {
@@ -43,10 +43,10 @@ class StatusHandlerMixin:
             print(f"  └{'─' * 79}┘")
 
             with open(current, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
+                raw = f.read()
 
             print(f"📤  Retornando current_state.json")
-            self._respond(200, body)
+            self._respond(extract_http_status(raw), extract_json_body(raw))
             print()
         except Exception as e:
             print(f"❌  Error: {e}")
@@ -61,9 +61,9 @@ class StatusHandlerMixin:
             if not os.path.exists(src):
                 raise FileNotFoundError(f"Response file no encontrado: {filename}")
             with open(src, "r", encoding="utf-8") as f:
-                body = extract_json_body(f.read())
+                raw = f.read()
             print(f"📤  Retornando {filename}")
-            self._respond(200, body)
+            self._respond(extract_http_status(raw), extract_json_body(raw))
             print()
         except Exception as e:
             print(f"❌  Error: {e}")
@@ -127,7 +127,9 @@ class StatusHandlerMixin:
                 raise FileNotFoundError(f"Response file no encontrado: {response_name}.json")
 
             with open(src_response, "r", encoding="utf-8") as f:
-                response_body = extract_json_body(f.read())
+                raw_response = f.read()
+            response_body = extract_json_body(raw_response)
+            response_code = extract_http_status(raw_response)
 
             new_status = response_body.get("data", {}).get("loyaltyStatus", "—").upper()
             new_action = response_body.get("data", {}).get("action", "—").upper()
@@ -143,7 +145,7 @@ class StatusHandlerMixin:
             print_operation_result(prev_status, prev_action, "STATUS", action, new_status, new_action)
 
             print(f"📤  Retornando {response_name}.json")
-            self._respond(200, response_body)
+            self._respond(response_code, response_body)
             print()
 
         except Exception as e:
