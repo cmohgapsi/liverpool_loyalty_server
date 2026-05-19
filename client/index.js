@@ -636,6 +636,13 @@ async function init() {
   await Promise.all([fetchStatus(), fetchLog()]);
   fetchCancelReasons();
   connectSSE();
+  document.querySelectorAll('input[name="ops-op"]').forEach(radio => {
+    radio.addEventListener("change", () => {
+      document.querySelectorAll(".ops-card").forEach(c => c.style.display = "none");
+      const card = document.getElementById(`ops-card-${radio.value}`);
+      if (card) card.style.display = "";
+    });
+  });
 }
 
 init();

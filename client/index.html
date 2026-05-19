@@ -69,89 +69,92 @@
 
     <!-- ── Operaciones ── -->
     <div class="ops-section-title">Operaciones</div>
-    <div class="ops-grid">
+    <div class="ops-radio-group">
+      <label class="ops-radio-label"><input type="radio" name="ops-op" value="set-status" />Set Status</label>
+      <label class="ops-radio-label"><input type="radio" name="ops-op" value="cancel-enroll" />Cancel Enroll</label>
+      <label class="ops-radio-label"><input type="radio" name="ops-op" value="enroll" />Enroll</label>
+      <label class="ops-radio-label"><input type="radio" name="ops-op" value="reenroll" />ReEnroll</label>
+    </div>
 
-      <!-- Set Status -->
-      <div class="card ops-card">
-        <div class="card-title">Set Status</div>
-        <div class="ops-body">
-          <div class="form-field">
-            <label class="form-label" for="op-status-action">Acción</label>
-            <select class="form-control" id="op-status-action">
-              <option value="enrollModalClosed">enrollModalClosed</option>
-              <option value="welcomeModalClosed">welcomeModalClosed</option>
-              <option value="displayWelcomeModal">displayWelcomeModal</option>
-              <option value="displayEnrollModal">displayEnrollModal</option>
-            </select>
-          </div>
-          <button class="ops-btn" id="btn-op-set-status" onclick="opSetStatus()">Ejecutar</button>
-          <div class="ops-feedback" id="fb-set-status"></div>
+    <!-- Set Status -->
+    <div class="card ops-card" id="ops-card-set-status" style="display:none">
+      <div class="card-title">Set Status</div>
+      <div class="ops-body">
+        <div class="form-field">
+          <label class="form-label" for="op-status-action">Acción</label>
+          <select class="form-control" id="op-status-action">
+            <option value="enrollModalClosed">enrollModalClosed</option>
+            <option value="welcomeModalClosed">welcomeModalClosed</option>
+            <option value="displayWelcomeModal">displayWelcomeModal</option>
+            <option value="displayEnrollModal">displayEnrollModal</option>
+          </select>
         </div>
+        <button class="ops-btn" id="btn-op-set-status" onclick="opSetStatus()">Ejecutar</button>
+        <div class="ops-feedback" id="fb-set-status"></div>
       </div>
+    </div>
 
-      <!-- Cancel Enroll -->
-      <div class="card ops-card">
-        <div class="card-title">Cancel Enroll</div>
-        <div class="ops-body">
-          <div class="form-field">
-            <label class="form-label" for="op-cancel-reason">Razón de cancelación</label>
-            <select class="form-control" id="op-cancel-reason" onchange="onCancelReasonChange()">
-              <option value="">Cargando razones…</option>
-            </select>
-          </div>
-          <div class="form-field" id="op-cancel-other-field" style="display:none">
-            <label class="form-label" for="op-cancel-other">Razón personalizada *</label>
-            <input class="form-control" id="op-cancel-other" type="text" placeholder="Escribe la razón…" />
-          </div>
-          <button class="ops-btn" id="btn-op-cancel" onclick="opCancelEnroll()">Ejecutar</button>
-          <div class="ops-feedback" id="fb-cancel-enroll"></div>
+    <!-- Cancel Enroll -->
+    <div class="card ops-card" id="ops-card-cancel-enroll" style="display:none">
+      <div class="card-title">Cancel Enroll</div>
+      <div class="ops-body">
+        <div class="form-field">
+          <label class="form-label" for="op-cancel-reason">Razón de cancelación</label>
+          <select class="form-control" id="op-cancel-reason" onchange="onCancelReasonChange()">
+            <option value="">Cargando razones…</option>
+          </select>
         </div>
-      </div>
-
-      <!-- Enroll -->
-      <div class="card ops-card">
-        <div class="card-title">Enroll</div>
-        <div class="ops-body">
-          <div class="form-field">
-            <label class="form-label" for="op-first-name">Nombre *</label>
-            <input class="form-control" id="op-first-name" type="text" placeholder="Carlos" />
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="op-last-name">Apellido paterno *</label>
-            <input class="form-control" id="op-last-name" type="text" placeholder="Moh" />
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="op-mother-name">Apellido materno *</label>
-            <input class="form-control" id="op-mother-name" type="text" placeholder="Lugo" />
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="op-gender">Género *</label>
-            <select class="form-control" id="op-gender">
-              <option value="">— seleccionar —</option>
-              <option value="M">Hombre (M)</option>
-              <option value="F">Mujer (F)</option>
-              <option value="I">Indefinido (I)</option>
-            </select>
-          </div>
-          <div class="form-field">
-            <label class="form-label" for="op-dob">Fecha de nacimiento * (DD/MM/AAAA)</label>
-            <input class="form-control" id="op-dob" type="text" placeholder="01/01/1990" />
-          </div>
-          <button class="ops-btn" id="btn-op-enroll" onclick="opEnroll()">Ejecutar</button>
-          <div class="ops-feedback" id="fb-enroll"></div>
+        <div class="form-field" id="op-cancel-other-field" style="display:none">
+          <label class="form-label" for="op-cancel-other">Razón personalizada *</label>
+          <input class="form-control" id="op-cancel-other" type="text" placeholder="Escribe la razón…" />
         </div>
+        <button class="ops-btn" id="btn-op-cancel" onclick="opCancelEnroll()">Ejecutar</button>
+        <div class="ops-feedback" id="fb-cancel-enroll"></div>
       </div>
+    </div>
 
-      <!-- ReEnroll -->
-      <div class="card ops-card">
-        <div class="card-title">ReEnroll</div>
-        <div class="ops-body">
-          <p class="ops-description">Re-enrola al usuario enviando un body vacío. Disponible cuando el estado es <code>unenrolled</code>.</p>
-          <button class="ops-btn" id="btn-op-reenroll" onclick="opReEnroll()">Ejecutar</button>
-          <div class="ops-feedback" id="fb-reenroll"></div>
+    <!-- Enroll -->
+    <div class="card ops-card" id="ops-card-enroll" style="display:none">
+      <div class="card-title">Enroll</div>
+      <div class="ops-body">
+        <div class="form-field">
+          <label class="form-label" for="op-first-name">Nombre *</label>
+          <input class="form-control" id="op-first-name" type="text" placeholder="Carlos" />
         </div>
+        <div class="form-field">
+          <label class="form-label" for="op-last-name">Apellido paterno *</label>
+          <input class="form-control" id="op-last-name" type="text" placeholder="Moh" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="op-mother-name">Apellido materno *</label>
+          <input class="form-control" id="op-mother-name" type="text" placeholder="Lugo" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="op-gender">Género *</label>
+          <select class="form-control" id="op-gender">
+            <option value="">— seleccionar —</option>
+            <option value="M">Hombre (M)</option>
+            <option value="F">Mujer (F)</option>
+            <option value="I">Indefinido (I)</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="op-dob">Fecha de nacimiento * (DD/MM/AAAA)</label>
+          <input class="form-control" id="op-dob" type="text" placeholder="01/01/1990" />
+        </div>
+        <button class="ops-btn" id="btn-op-enroll" onclick="opEnroll()">Ejecutar</button>
+        <div class="ops-feedback" id="fb-enroll"></div>
       </div>
+    </div>
 
+    <!-- ReEnroll -->
+    <div class="card ops-card" id="ops-card-reenroll" style="display:none">
+      <div class="card-title">ReEnroll</div>
+      <div class="ops-body">
+        <p class="ops-description">Re-enrola al usuario enviando un body vacío. Disponible cuando el estado es <code>unenrolled</code>.</p>
+        <button class="ops-btn" id="btn-op-reenroll" onclick="opReEnroll()">Ejecutar</button>
+        <div class="ops-feedback" id="fb-reenroll"></div>
+      </div>
     </div>
   </main>
 

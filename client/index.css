@@ -674,10 +674,35 @@ main {
   margin-bottom: 12px;
 }
 
-.ops-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+.ops-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.ops-radio-label {
+  display: flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color .15s, background .15s, color .15s;
+  user-select: none;
+}
+.ops-radio-label:hover { background: var(--bg); }
+.ops-radio-label input[type="radio"] { display: none; }
+.ops-radio-label:has(input:checked) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
 }
 
 .ops-body {
