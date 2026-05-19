@@ -31,8 +31,10 @@ decommission/
 │   ├── index.js                            ← Lógica del cliente
 │   └── README.md                           ← Documentación del cliente → ver client/README.md
 ├── documentation/
-│   ├── LIVERPOOL-DECOMMISSION.postman_collection.json  ← Colección Postman con los endpoints
-│   └── LoyaltyStatus.png                               ← Diagrama de estados de lealtad
+│   ├── LIVERPOOL-DECOMMISSION.postman_collection.json        ← Colección Postman con los endpoints
+│   ├── LIVERPOOL-DECOMMISSION.postman_environment.json       ← Entorno Postman (pocket-bff)
+│   ├── LIVERPOOL-DECOMMISSION WEB.postman_environment.json   ← Entorno Postman (web-bff)
+│   └── LoyaltyStatus.png                                     ← Diagrama de estados de lealtad
 ├── states/
 │   ├── current_state.json              ← Estado actual (leído y modificado por varios endpoints)
 │   ├── enrolled_welcome_state.json
@@ -41,18 +43,23 @@ decommission/
 │   ├── declined_none_state.json
 │   └── unenrolled_none_state.json
 ├── responses/
-│   ├── path_status_enroll_welcome.json
-│   ├── path_status_notEnrolled_enroll.json
-│   ├── path_status_enrolled.json
-│   ├── path_status_declined.json
-│   ├── path_status_unenroll.json
-│   ├── get_loyalty_coupons_enrolled_empty.json
-│   ├── get_loyalty_coupons_enrolled_full.json
-│   ├── get_loyalty_coupons_redeemed_empty.json
-│   ├── get_loyalty_coupons_redeemed_full.json
-│   ├── get_checkout_coupons_cart.json
-│   ├── get_checkout_coupons_no_cart_error.json
-│   └── get_loyalty_cancel_reasons.json
+│   ├── path_status_enrolled.json                         ← PATCH welcomeModalClosed → enrolled/none
+│   ├── path_status_enroll_welcome.json                   ← PATCH displayWelcomeModal → enrolled/displayWelcomeModal
+│   ├── path_status_notEnrolled_enroll.json               ← PATCH displayEnrollModal → notEnrolled/displayEnrollModal
+│   ├── path_status_declined.json                         ← PATCH enrollModalClosed → declined/none
+│   ├── path_status_unenroll.json                         ← PATCH unenroll → unenrolled/none
+│   ├── get_loyalty_coupons_enrolled_empty.json           ← COUPONS_LIST_SUFFIX=empty
+│   ├── get_loyalty_coupons_enrolled_full.json            ← COUPONS_LIST_SUFFIX=full
+│   ├── get_loyalty_coupons_enrolled_server_error.json    ← COUPONS_LIST_SUFFIX=server_error
+│   ├── get_loyalty_coupons_enrolled_bad_request.json     ← COUPONS_LIST_SUFFIX=bad_request
+│   ├── get_loyalty_coupons_enrolled_200_status_error.json← COUPONS_LIST_SUFFIX=200_status_error
+│   ├── get_loyalty_coupons_redeemed_empty.json           ← COUPONS_REDEEMED_SUFFIX=empty
+│   ├── get_loyalty_coupons_redeemed_full.json            ← COUPONS_REDEEMED_SUFFIX=full
+│   ├── get_checkout_coupons_cart.json                    ← CHECKOUT_COUPONS_SUFFIX=cart
+│   ├── get_checkout_coupons_no_cart_error.json           ← CHECKOUT_COUPONS_SUFFIX=no_cart_error
+│   ├── get_loyalty_cancel_reasons.json                   ← GET cancel-reasons (fallback)
+│   └── web-bff/
+│       └── get_checkout_coupons_cart.json                ← override para web-bff
 ├── .env                                ← Variables de entorno (no versionado, créalo desde .env-example)
 ├── .env-example                        ← Plantilla de variables de entorno
 ├── loyalty_server.py                   ← Servidor local: routing, ThreadingHTTPServer, entry point
