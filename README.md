@@ -125,27 +125,22 @@ CHECKOUT_COUPONS_SUFFIX=cart
 
 Configura una sola regla Map Remote que cubra todos los endpoints según el `TARGET_BASE_PATH` configurado.
 
-**Match URL** (regex — reemplaza `<base>` con el valor de `TARGET_BASE_PATH`):
+**Use Regex**
+
+**RULE** (regex — reemplaza `<base>` con el valor de `TARGET_BASE_PATH`):
 ```
-^\/<base>\/.*
+https?://[^/]+(/<base>/(?:users/me/loyalty/.*|checkout/coupons|loyalty/cancel-reasons))
 ```
 
 Ejemplo con `TARGET_BASE_PATH=pocket-bff`:
 ```
-^\/pocket-bff\/.*
+https?://[^/]+(/pocket-bff/(?:users/me/loyalty/.*|checkout/coupons|loyalty/cancel-reasons))
 ```
 
 **Método:** `ANY`
-
-**Redirect to** (reemplaza `<base>` con el valor de `TARGET_BASE_PATH`):
-```
-http://localhost:9876/<base>/*
-```
-
-Ejemplo con `TARGET_BASE_PATH=pocket-bff`:
-```
-http://localhost:9876/pocket-bff/*
-```
+**Protocol:** `http`
+**Port:** `9876`
+**Path (deja el path en blanco):** ``
 
 > Si cambias `TARGET_BASE_PATH` (en `.env` o vía `PUT /configuration`), actualiza también la regla de Proxyman con el nuevo valor.
 
