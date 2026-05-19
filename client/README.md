@@ -31,6 +31,24 @@ Cambia `BASE_URL` si el servidor corre en un puerto distinto. El `TARGET_BASE_PA
 
 ---
 
+## Layout
+
+El cliente usa un layout de **tres columnas** que comparten el espacio horizontal:
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                       Header sticky                      │
+├──────────────┬──────────────────────────┬───────────────┤
+│  Log panel   │         Main             │ Config panel  │
+│  (380 px)    │   (flex: 1, scroll)      │  (360 px)     │
+│  ocultable   │                          │  ocultable    │
+└──────────────┴──────────────────────────┴───────────────┘
+```
+
+Ambos paneles laterales se muestran/ocultan con los botones del header y **nunca se superponen** al contenido central — empujan el `main` al abrirse.
+
+---
+
 ## Header sticky
 
 Siempre visible en la parte superior. Muestra de un vistazo el estado de la membresía actual:
@@ -50,11 +68,11 @@ Siempre visible en la parte superior. Muestra de un vistazo el estado de la memb
 
 ## Panel de log
 
-Se abre y cierra con el botón **Log** del header (resaltado en azul cuando está visible). También se puede cerrar con el backdrop o el botón **✕**.
+Se abre y cierra con el botón **Log** del header (resaltado en azul cuando está visible). También se puede cerrar con el botón **✕**.
 
 ### Entradas mostradas
 
-El panel muestra todas las operaciones registradas excepto `GET /log` y `GET /configuration` (que son lecturas internas del propio cliente). Las entradas se ordenan de **más reciente a más antigua** (la operación más nueva aparece arriba).
+El panel muestra todas las operaciones registradas excepto `GET /log`, `GET /configuration` y `GET /events` (lecturas internas del propio cliente). Las entradas se ordenan de **más reciente a más antigua**.
 
 ### Formato de cada entrada
 
@@ -75,7 +93,7 @@ Un `↑` separa cada par de entradas consecutivas, indicando que el tiempo fluye
 
 ### Botón de detalle `i`
 
-Abre un modal con todos los campos del log entry y el curl reproducible:
+Abre un modal con todos los campos del log entry, el curl reproducible y el response del servidor (ambos en bloques de código con botón **Copiar**):
 
 ```bash
 curl -X PATCH "http://localhost:9876/web-bff/users/me/loyalty/status" \
@@ -83,17 +101,15 @@ curl -X PATCH "http://localhost:9876/web-bff/users/me/loyalty/status" \
   -d '{"action": "welcomeModalClosed", "value": true}'
 ```
 
-El botón **Copiar** copia el curl al portapapeles.
-
 ### Limpiar
 
 El botón **Limpiar** envía `DELETE /log`. El servidor vacía `server.log` y emite el evento SSE `log-cleared`, que limpia la vista del panel inmediatamente.
 
 ### Push en tiempo real (SSE)
 
-Al arrancar, el cliente abre una conexión `GET /events` con el servidor. Cada operación que el servidor procesa notifica al cliente vía SSE sin necesidad de polling:
+Al arrancar, el cliente abre una conexión `GET /events` con el servidor. Cada operación que el servidor procesa notifica al cliente vía SSE sin polling:
 
-- **`log-entry`** — el cliente prepende la nueva entrada al panel de log. Si el entry incluye `new_status` (cambio de estado) o es un POST enroll exitoso, el cliente también refresca automáticamente los cards de status.
+- **`log-entry`** — el cliente prepende la nueva entrada al panel de log. Si el entry incluye `new_status` o es un POST enroll exitoso, también refresca el header y el card de usuario.
 - **`log-cleared`** — el cliente limpia su panel de log.
 
 El punto de color en el header refleja el estado de la conexión SSE: verde = activo, rojo = desconectado (el browser reconecta automáticamente).
@@ -102,7 +118,7 @@ El punto de color en el header refleja el estado de la conexión SSE: verde = ac
 
 ## Panel de configuración
 
-Se abre y cierra con el botón **⚙️ Config** del header (resaltado en azul cuando está visible). También se puede cerrar con el backdrop o el botón **✕**.
+Se abre y cierra con el botón **Config** del header (resaltado en azul cuando está visible). También se puede cerrar con el botón **✕**.
 
 ### Secciones del panel
 
@@ -129,20 +145,83 @@ Lista los paths que el servidor está atendiendo actualmente, derivados del `TAR
 
 ### Cambios pendientes
 
-Al modificar cualquier valor del formulario sin haber aplicado los cambios:
+Al modificar cualquier valor sin haber aplicado los cambios:
 
 - El campo modificado se resalta con **borde azul y fondo celeste**.
-- Aparece un aviso amarillo sobre el botón: _"● N cambio(s) pendiente(s) de aplicar"_.
+- Aparece un aviso amarillo: _"● N cambio(s) pendiente(s) de aplicar"_.
 - Al revertir un campo a su valor original, deja de contar como pendiente.
 
 ### Aplicar cambios
 
-El botón **Aplicar cambios** envía un `PUT /configuration` con todos los valores del formulario.  
-Tras la respuesta exitosa del servidor:
+El botón **Aplicar cambios** envía un `PUT /configuration`. Tras la respuesta exitosa:
 
 - El panel se repinta con los valores confirmados.
 - Los resaltados de cambios pendientes desaparecen.
-- El header y los cards se recargan usando el nuevo path de status (útil si cambió el `TARGET_BASE_PATH`).
+- El header y el card de usuario se recargan con el nuevo path de status.
+
+---
+
+## Sección de Operaciones
+
+Selector de radio buttons estilo pill (uno por operación). Al seleccionar una, se muestra el card correspondiente; las demás se ocultan. Por defecto ninguna está seleccionada.
+
+### Set Status
+
+Envía `PATCH /<base>/users/me/loyalty/status` con la acción seleccionada y `value: true`.
+
+| Acción | Transición |
+|---|---|
+| `welcomeModalClosed` | enrolled / displayWelcomeModal → enrolled / none |
+| `enrollModalClosed` | → declined / none |
+| `displayWelcomeModal` | → enrolled / displayWelcomeModal |
+| `displayEnrollModal` | → notEnrolled / displayEnrollModal |
+
+### Cancel Enroll
+
+Envía `PATCH /<base>/users/me/loyalty/status` con `action: "unenroll"` y el `cancelReason` seleccionado.
+
+- Las razones se cargan automáticamente desde `GET /<base>/loyalty/cancel-reasons` al iniciar (esta llamada **no se registra en el log** gracias al header `server-log: false`).
+- Al seleccionar **"Otro…"** aparece un campo de texto para introducir una razón personalizada.
+- El servidor retorna **409** si el estado actual no es `enrolled`.
+
+### Enroll
+
+Envía `POST /<base>/users/me/loyalty/enroll` con los datos del formulario. Todos los campos son obligatorios:
+
+| Campo | Descripción |
+|---|---|
+| Nombre | `firstName` |
+| Apellido paterno | `lastName` |
+| Apellido materno | `motherLastName` |
+| Género | `M` · `F` · `I` |
+| Fecha de nacimiento | `dateOfBirth` (DD/MM/AAAA) |
+
+### ReEnroll
+
+Envía `POST /<base>/users/me/loyalty/enroll` con body vacío `{}`. Disponible cuando el estado es `unenrolled`.
+
+### Coupons
+
+Tres operaciones de consulta (GET), cada una con su botón:
+
+| Botón | Endpoint | Parámetro |
+|---|---|---|
+| **Loyalty Coupons** | `GET /<base>/users/me/loyalty/coupons` | — |
+| **Redeemed Coupons** | `GET /<base>/users/me/loyalty/coupons/redeemed` | — |
+| **Checkout Coupons** | `GET /<base>/checkout/coupons` | `isBuyNow` (true · false) |
+
+El selector `isBuyNow` y el botón de Checkout Coupons se presentan en una subsección visualmente separada para dejar claro que el parámetro pertenece a esa operación.
+
+---
+
+## Comportamiento del log en el cliente
+
+Las siguientes llamadas se realizan con el header `server-log: false` y **no aparecen en el panel de log**:
+
+- `GET /<base>/users/me/loyalty/status` (refresco automático de estado)
+- `GET /<base>/loyalty/cancel-reasons` (carga de razones de cancelación)
+
+Todas las operaciones de la sección **Operaciones** sí se registran.
 
 ---
 
@@ -150,9 +229,9 @@ Tras la respuesta exitosa del servidor:
 
 | Archivo | Descripción |
 |---|---|
-| `index.html` | Estructura y markup: header, cards, panel de log, panel de config, modal |
-| `index.css` | Estilos: variables, layout, cards, paneles, log entries, modal |
-| `index.js` | Lógica: fetch, render, log panel, SSE, modal de detalle, dirty-state |
+| `index.html` | Estructura y markup: header, panel de log, main, panel de config, modal |
+| `index.css` | Estilos: variables, layout 3 columnas, paneles, radio group, log entries, modal |
+| `index.js` | Lógica: fetch, render, SSE, operaciones, modal de detalle, dirty-state |
 
 ---
 
@@ -161,12 +240,12 @@ Tras la respuesta exitosa del servidor:
 ```
 init()
   ├─ GET /configuration → paths + config → renderConfigPanel()
-  ├─ GET /<base>/status → renderHeader() + renderLoyaltyCard() + renderUserCard()
+  ├─ GET /<base>/status → renderHeader() + renderUserCard()   [server-log: false]
   ├─ GET /log           → logEntries[] → renderLogPanel()
-  └─ GET /events  (SSE, conexión persistente)
-         ├─ "log-entry"   → unshift(entry) → renderLogPanel()
-         │                  si new_status → fetchStatus()
-         └─ "log-cleared" → logEntries=[] → renderLogPanel()
+  ├─ GET /<base>/cancel-reasons → poblar select              [server-log: false]
+  ├─ GET /events  (SSE, conexión persistente)
+  │      ├─ "log-entry"   → unshift(entry) → renderLogPanel()
+  │      │                  si new_status o POST 200 → fetchStatus()
+  │      └─ "log-cleared" → logEntries=[] → renderLogPanel()
+  └─ attach radio listeners → mostrar/ocultar ops-card por valor
 ```
-
-De esta forma, el cliente se mantiene sincronizado con el servidor sin polling: cualquier operación del servidor (desde Postman, curl o la app) actualiza el panel de log y el estado de membresía en tiempo real.

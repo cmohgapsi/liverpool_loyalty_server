@@ -522,10 +522,16 @@ Recibe un body JSON con `action` y `value`, aplica la transición de estado corr
 { "action": "<action>", "value": true }
 ```
 
-> **Regla especial — `unenroll`:** el body debe incluir además el campo `cancelReason` (string). Si no se recibe, el servidor responde 400:
-> ```json
-> { "status": { "status": "ERROR", "statusCode": 400, "successMessage": "cancelReason do not received" } }
-> ```
+> **Regla especial — `unenroll`:** se aplican dos validaciones previas en orden:
+>
+> 1. **Estado actual no es `enrolled`** → responde 409 antes de verificar cualquier otro campo:
+>    ```json
+>    { "status": { "status": "ERROR", "statusCode": 409, "successMessage": "invalid operation, current membership is not enrolled" } }
+>    ```
+> 2. **Campo `cancelReason` faltante o no string** → responde 400:
+>    ```json
+>    { "status": { "status": "ERROR", "statusCode": 400, "successMessage": "cancelReason do not received" } }
+>    ```
 
 **Escenarios disponibles:**
 
@@ -577,9 +583,33 @@ cp states/enrolled_welcome_state.json states/current_state.json
 
 ---
 
+## Supresión del log — header `server-log: false`
+
+Cualquier request que incluya el header `server-log: false` es procesado con normalidad pero **no se registra en `server.log`** y no emite evento SSE `log-entry`.
+
+El cliente web usa este mecanismo en dos llamadas internas para evitar contaminar el panel de log:
+
+- `GET /<base>/users/me/loyalty/status` (refresco automático del header)
+- `GET /<base>/loyalty/cancel-reasons` (carga del selector de razones)
+
+---
+
+## Código HTTP de archivos de respuesta
+
+El servidor extrae el código HTTP de la **primera línea** de cada archivo en `responses/` y lo usa como código de respuesta real:
+
+```
+HTTP/1.1 200 OK          →  responde 200
+HTTP/1.1 404 Not Found   →  responde 404
+```
+
+Si el archivo no contiene cabecera HTTP (solo JSON), el servidor usa `200` como fallback. Esto permite simular errores simplemente editando la primera línea de un archivo de respuesta.
+
+---
+
 ## server.log
 
-Cada request recibido por el servidor queda registrado como una línea JSONL en `server.log`:
+Cada request recibido por el servidor queda registrado como una línea JSONL en `server.log` (salvo los que incluyan `server-log: false`):
 
 ```json
 {
@@ -727,6 +757,7 @@ App → PATCH /<base>/users/me/loyalty/status
         ▼
   loyalty_server.py → status_handler.py
         ├─ Lee action + value del body
+        ├─ unenroll → valida status actual == enrolled → 409 si no
         ├─ unenroll → valida cancelReason (string) → 400 si falta
         ├─ Busca en SCENARIOS
         ├─ Copia state_X.json → current_state.json

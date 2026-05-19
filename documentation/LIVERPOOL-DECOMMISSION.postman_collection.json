@@ -11,13 +11,272 @@
       "name": "mock-loyalty-server",
       "item": [
         {
+          "name": "configuration",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/configuration",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "configuration"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/configuration",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "configuration"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "",
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 18 May 2026 20:41:30 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "556"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, POST, PUT, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"version\": \"1.0.0\",\n    \"TARGET_BASE_PATH\": \"web-bff\",\n    \"COUPONS_LIST_SUFFIX\": \"full\",\n    \"COUPONS_REDEEMED_SUFFIX\": \"full\",\n    \"CHECKOUT_COUPONS_SUFFIX\": \"cart\",\n    \"LOYALTY_MEMBER_ID\": \"720100015844\",\n    \"USER_ID\": 2465729859,\n    \"paths\": {\n        \"status\": \"/web-bff/users/me/loyalty/status\",\n        \"coupons\": \"/web-bff/users/me/loyalty/coupons\",\n        \"redeemed\": \"/web-bff/users/me/loyalty/coupons/redeemed\",\n        \"enroll\": \"/web-bff/users/me/loyalty/enroll\",\n        \"checkoutCoupons\": \"/web-bff/checkout/coupons\",\n        \"cancelReasons\": \"/web-bff/loyalty/cancel-reasons\",\n        \"configuration\": \"/configuration\"\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "configuration",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"TARGET_BASE_PATH\": \"pocket-bff\",\n    \"COUPONS_LIST_SUFFIX\": \"full\",\n    \"COUPONS_REDEEMED_SUFFIX\": \"full\",\n    \"CHECKOUT_COUPONS_SUFFIX\": \"cart\",\n    \"LOYALTY_MEMBER_ID\": \"720100015844\",\n    \"USER_ID\": 2465729859\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/configuration",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "configuration"
+              ]
+            }
+          },
+          "response": [
+            {
+              "name": "OK",
+              "originalRequest": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"TARGET_BASE_PATH\": \"web-bff\",\n    \"COUPONS_LIST_SUFFIX\": \"full\",\n    \"COUPONS_REDEEMED_SUFFIX\": \"full\",\n    \"CHECKOUT_COUPONS_SUFFIX\": \"cart\",\n    \"LOYALTY_MEMBER_ID\": \"720100015844\",\n    \"USER_ID\": 2465729859\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/configuration",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "configuration"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "",
+              "header": [
+                {
+                  "key": "Server",
+                  "value": "BaseHTTP/0.6 Python/3.13.3"
+                },
+                {
+                  "key": "Date",
+                  "value": "Mon, 18 May 2026 20:43:43 GMT"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json; charset=utf-8"
+                },
+                {
+                  "key": "Content-Length",
+                  "value": "825"
+                },
+                {
+                  "key": "x-correlation-id",
+                  "value": "66b141f0e5a34e59e4604b6ad3a50e1a"
+                },
+                {
+                  "key": "x-app-version",
+                  "value": "3.892.5"
+                },
+                {
+                  "key": "x-content-type-options",
+                  "value": "nosniff"
+                },
+                {
+                  "key": "Access-Control-Allow-Origin",
+                  "value": "*"
+                },
+                {
+                  "key": "Access-Control-Allow-Methods",
+                  "value": "GET, POST, PUT, PATCH, OPTIONS"
+                },
+                {
+                  "key": "Access-Control-Allow-Headers",
+                  "value": "Content-Type, Authorization, x-correlation-id"
+                }
+              ],
+              "cookie": [
+                {
+                  "expires": "Invalid Date",
+                  "domain": "",
+                  "path": ""
+                }
+              ],
+              "body": "{\n    \"status\": {\n        \"status\": \"OK\",\n        \"statusCode\": 0\n    },\n    \"updated\": {\n        \"TARGET_BASE_PATH\": \"web-bff\",\n        \"COUPONS_LIST_SUFFIX\": \"full\",\n        \"COUPONS_REDEEMED_SUFFIX\": \"full\",\n        \"CHECKOUT_COUPONS_SUFFIX\": \"cart\",\n        \"LOYALTY_MEMBER_ID\": \"720100015844\",\n        \"USER_ID\": 2465729859\n    },\n    \"configuration\": {\n        \"version\": \"1.0.0\",\n        \"TARGET_BASE_PATH\": \"web-bff\",\n        \"COUPONS_LIST_SUFFIX\": \"full\",\n        \"COUPONS_REDEEMED_SUFFIX\": \"full\",\n        \"CHECKOUT_COUPONS_SUFFIX\": \"cart\",\n        \"LOYALTY_MEMBER_ID\": \"720100015844\",\n        \"USER_ID\": 2465729859,\n        \"paths\": {\n            \"status\": \"/web-bff/users/me/loyalty/status\",\n            \"coupons\": \"/web-bff/users/me/loyalty/coupons\",\n            \"redeemed\": \"/web-bff/users/me/loyalty/coupons/redeemed\",\n            \"enroll\": \"/web-bff/users/me/loyalty/enroll\",\n            \"checkoutCoupons\": \"/web-bff/checkout/coupons\",\n            \"cancelReasons\": \"/web-bff/loyalty/cancel-reasons\",\n            \"configuration\": \"/configuration\"\n        }\n    }\n}"
+            }
+          ]
+        },
+        {
+          "name": "LOG",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "server-log",
+                "value": "false",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/log",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "log"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOG",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "server-log",
+                "value": "false",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/log",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "log"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "SET loyalty/status",
           "request": {
             "method": "PATCH",
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"action\": \"displayEnrollModal\", //welcomeModalClosed enrollModalClosed displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
+              "raw": "{\n  \"action\": \"enrollModalClosed\", //welcomeModalClosed enrollModalClosed displayWelcomeModal displayEnrollModal\n  \"value\": true\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1118,42 +1377,7 @@
               ]
             }
           },
-          "response": [
-            {
-              "name": "cancelReasons",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{POCKET_URL}}/loyalty/cancel-reasons",
-                  "host": [
-                    "{{POCKET_URL}}"
-                  ],
-                  "path": [
-                    "loyalty",
-                    "cancel-reasons"
-                  ]
-                }
-              },
-              "_postman_previewlanguage": "json",
-              "header": [
-                {
-                  "key": "Content-Type",
-                  "value": "application/json",
-                  "description": "",
-                  "type": "text"
-                }
-              ],
-              "cookie": [
-                {
-                  "expires": "Invalid Date",
-                  "domain": "",
-                  "path": ""
-                }
-              ],
-              "body": "{\r\n    \"status\": {\r\n        \"status\": \"OK\",\r\n        \"statusCode\": 0\r\n    },\r\n    \"cancelReasons\": [\r\n        \"No me intersó el programa\",\r\n        \"Otro\",\r\n        \"No hay ofertas\"\r\n    ]\r\n}"
-            }
-          ]
+          "response": []
         }
       ]
     }
