@@ -81,6 +81,18 @@ class StatusHandlerMixin:
 
             print(f"📨  PATCH {self.path} → action='{action}', value={value}")
 
+            if action == "unenroll":
+                current_status, _ = read_current_status(current)
+                if current_status.upper() != "ENROLLED":
+                    print(f"⚠️  409 PATCH {self.path} — unenroll rechazado, status actual: {current_status}")
+                    print()
+                    self._respond(409, {"status": {
+                        "status": "ERROR",
+                        "statusCode": 409,
+                        "successMessage": "invalid operation, current membership is not enrolled"
+                    }})
+                    return
+
             if action == "unenroll" and not isinstance(data.get("cancelReason"), str):
                 print(f"⚠️  400 PATCH {self.path} — campo 'cancelReason' faltante o inválido")
                 print()
