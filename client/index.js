@@ -522,6 +522,22 @@ function onCancelReasonChange() {
   document.getElementById("op-cancel-other-field").style.display = isOther ? "" : "none";
 }
 
+async function opGetStatus() {
+  const path = config?.paths?.status;
+  if (!path) { opFeedback("fb-set-status", "Config no cargada", false); return; }
+  opBusy("btn-op-get-status", true);
+  try {
+    const res  = await fetch(`${BASE_URL}${path}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-set-status", `✓ ${data?.loyaltyData?.status ?? "OK"}`, true);
+  } catch (e) {
+    opFeedback("fb-set-status", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-get-status", false);
+  }
+}
+
 async function opSetStatus() {
   const action = document.getElementById("op-status-action").value;
   const path   = config?.paths?.status;

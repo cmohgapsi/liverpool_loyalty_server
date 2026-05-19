@@ -70,19 +70,19 @@
     <!-- ── Operaciones ── -->
     <div class="ops-section-title">Operaciones</div>
     <div class="ops-radio-group">
-      <label class="ops-radio-label"><input type="radio" name="ops-op" value="set-status" />Set Status</label>
+      <label class="ops-radio-label"><input type="radio" name="ops-op" value="set-status" />Status</label>
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="cancel-enroll" />Cancel Enroll</label>
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="enroll" />Enroll</label>
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="reenroll" />ReEnroll</label>
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="coupons" />Coupons</label>
     </div>
 
-    <!-- Set Status -->
+    <!-- Status -->
     <div class="card ops-card" id="ops-card-set-status" style="display:none">
-      <div class="card-title">Set Status</div>
+      <div class="card-title">Status</div>
       <div class="ops-body">
         <div class="form-field">
-          <label class="form-label" for="op-status-action">Acción</label>
+          <label class="form-label" for="op-status-action">Acción (PATCH)</label>
           <select class="form-control" id="op-status-action">
             <option value="enrollModalClosed">enrollModalClosed</option>
             <option value="welcomeModalClosed">welcomeModalClosed</option>
@@ -90,7 +90,11 @@
             <option value="displayEnrollModal">displayEnrollModal</option>
           </select>
         </div>
-        <button class="ops-btn" id="btn-op-set-status" onclick="opSetStatus()">Ejecutar</button>
+        <button class="ops-btn" id="btn-op-set-status" onclick="opSetStatus()">PATCH Status</button>
+        <div class="ops-subsection">
+          <div class="ops-subsection-title">GET Status</div>
+          <button class="ops-btn" id="btn-op-get-status" onclick="opGetStatus()">GET Status</button>
+        </div>
         <div class="ops-feedback" id="fb-set-status"></div>
       </div>
     </div>
