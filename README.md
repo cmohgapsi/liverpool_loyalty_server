@@ -105,7 +105,7 @@ CHECKOUT_COUPONS_SUFFIX=cart
 | `BASE_PATH` | ruta absoluta | Ruta a la carpeta `decommission/`. Ajústala si mueves el proyecto. |
 | `PORT` | `9876` | Puerto del servidor local. |
 | `TARGET_BASE_PATH` | `pocket-bff` · `web-bff` | Prefijo base de todos los endpoints. Cambia este valor para apuntar a un BFF distinto. |
-| `COUPONS_LIST_SUFFIX` | `empty` · `full` | Archivo de cupones de lealtad a servir. |
+| `COUPONS_LIST_SUFFIX` | `empty` · `full` · `server_error` · `bad_request` | Archivo de cupones de lealtad a servir. |
 | `COUPONS_REDEEMED_SUFFIX` | `empty` · `full` | Archivo de cupones canjeados a servir. |
 | `LOYALTY_MEMBER_ID` | string | ID de miembro de lealtad retornado en el response de enroll. |
 | `USER_ID` | número | ID de usuario retornado en el response de enroll. |
@@ -235,7 +235,7 @@ Actualiza en memoria uno o más valores configurables sin reiniciar el servidor.
 | Campo | Tipo | Valores posibles |
 |---|---|---|
 | `TARGET_BASE_PATH` | string | `pocket-bff` · `web-bff` |
-| `COUPONS_LIST_SUFFIX` | string | `empty` · `full` |
+| `COUPONS_LIST_SUFFIX` | string | `empty` · `full` · `server_error` · `bad_request` |
 | `COUPONS_REDEEMED_SUFFIX` | string | `empty` · `full` |
 | `CHECKOUT_COUPONS_SUFFIX` | string | `cart` · `no_cart_error` |
 | `LOYALTY_MEMBER_ID` | string | cualquier string |
@@ -354,10 +354,13 @@ Devuelve el contenido actual de `states/current_state.json` e imprime en consola
 
 Devuelve `responses/get_loyalty_coupons_enrolled_{COUPONS_LIST_SUFFIX}.json`.
 
-Para cambiar entre lista vacía y lista completa, edita `COUPONS_LIST_SUFFIX` en `.env` y reinicia el servidor:
+Para cambiar la respuesta, edita `COUPONS_LIST_SUFFIX` en `.env` y reinicia el servidor (o usa `PUT /configuration`):
 
 ```env
-COUPONS_LIST_SUFFIX=full
+COUPONS_LIST_SUFFIX=full          # lista completa
+COUPONS_LIST_SUFFIX=empty         # lista vacía
+COUPONS_LIST_SUFFIX=server_error  # error de servidor (código HTTP del archivo)
+COUPONS_LIST_SUFFIX=bad_request   # bad request (código HTTP del archivo)
 ```
 
 ```
