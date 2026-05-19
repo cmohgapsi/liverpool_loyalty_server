@@ -124,16 +124,17 @@ class LoyaltyHandler(EventsHandlerMixin, ConfigHandlerMixin, LogHandlerMixin, Co
         self._send_cors_headers()
         self.end_headers()
         self.wfile.write(body)
-        entry = log_request(
-            self.command,
-            *self.server.server_address,
-            self.path,
-            code,
-            getattr(self, "_request_body", None),
-            response=payload,
-            **getattr(self, "_log_extras", {}),
-        )
-        push_log_entry(entry)
+        if self.headers.get("server-log", "").lower() != "false":
+            entry = log_request(
+                self.command,
+                *self.server.server_address,
+                self.path,
+                code,
+                getattr(self, "_request_body", None),
+                response=payload,
+                **getattr(self, "_log_extras", {}),
+            )
+            push_log_entry(entry)
 
     def log_message(self, *args):
         pass  # silencia logs HTTP del servidor
