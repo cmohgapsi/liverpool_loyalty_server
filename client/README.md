@@ -138,6 +138,7 @@ Permite modificar los valores configurables sin reiniciar el servidor:
 | Cupones de checkout | `<select>` | `cart` · `no_cart_error` |
 | Loyalty Member ID | texto libre | cualquier string |
 | User ID | numérico | cualquier número |
+| Delay (ms) | numérico | milisegundos de delay antes de responder (`0` = sin delay) |
 
 #### Paths activos _(solo lectura)_
 
@@ -218,9 +219,9 @@ El selector `isBuyNow` y el botón de Checkout Coupons se presentan en una subse
 
 ---
 
-## Comportamiento del log en el cliente
+## Comportamiento del log y el delay en el cliente
 
-Las siguientes llamadas se realizan con el header `server-log: false` y **no aparecen en el panel de log**:
+Las siguientes llamadas se realizan con los headers `server-log: false` y `server_delay: false`, por lo que **no aparecen en el panel de log** y **no se ven afectadas por el delay configurado**:
 
 - `GET /<base>/users/me/loyalty/status` (refresco automático de estado)
 - `GET /<base>/loyalty/cancel-reasons` (carga de razones de cancelación)

@@ -110,6 +110,7 @@ CHECKOUT_COUPONS_SUFFIX=cart
 | `LOYALTY_MEMBER_ID` | string | ID de miembro de lealtad retornado en el response de enroll. |
 | `USER_ID` | número | ID de usuario retornado en el response de enroll. |
 | `CHECKOUT_COUPONS_SUFFIX` | `cart` · `no_cart_error` | Archivo de cupones de checkout a servir. |
+| `DELAY_MS` | número ≥ 0 | Milisegundos de delay antes de responder. `0` = sin delay. No aplica para `/log` ni `/configuration`. No aplica si el request lleva `server_delay: false`. |
 
 ---
 
@@ -240,6 +241,7 @@ Actualiza en memoria uno o más valores configurables sin reiniciar el servidor.
 | `CHECKOUT_COUPONS_SUFFIX` | string | `cart` · `no_cart_error` |
 | `LOYALTY_MEMBER_ID` | string | cualquier string |
 | `USER_ID` | number | cualquier número |
+| `DELAY_MS` | number | milisegundos de delay (0 = sin delay) |
 
 **Body de ejemplo:**
 ```json
@@ -584,6 +586,18 @@ cp states/notEnrolled_enroll_state.json states/current_state.json
 # Cualquier otro estado
 cp states/enrolled_welcome_state.json states/current_state.json
 ```
+
+---
+
+## Delay de respuesta — `DELAY_MS`
+
+Cuando `DELAY_MS > 0`, el servidor espera ese número de milisegundos antes de responder. Útil para simular latencia de red.
+
+El delay **no aplica** en los siguientes casos:
+- Path `/log` o `/configuration`
+- Request que incluya el header `server_delay: false`
+
+El cliente web envía `server_delay: false` en las llamadas internas que no deben verse afectadas por el delay configurado (refresco automático del header de status y carga de razones de cancelación).
 
 ---
 

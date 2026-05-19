@@ -36,6 +36,11 @@ const FIELD_DEFS = [
     label: "User ID",
     type:  "number",
   },
+  {
+    key:   "DELAY_MS",
+    label: "Delay (ms)",
+    type:  "number",
+  },
 ];
 
 // ── Labels ────────────────────────────────────────────────────────────────────
@@ -252,7 +257,7 @@ async function fetchStatus() {
     const statusPath = config?.paths?.status;
     if (!statusPath) throw new Error("Configuración no cargada");
     const res  = await fetch(`${BASE_URL}${statusPath}`, {
-      headers: { "server-log": "false" },
+      headers: { "server-log": "false", "server_delay": "false" },
     });
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -497,7 +502,7 @@ async function fetchCancelReasons() {
   if (!path) { select.innerHTML = `<option value="">Config no cargada</option>`; return; }
   try {
     const res = await fetch(`${BASE_URL}${path}`, {
-      headers: { "server-log": "false" },
+      headers: { "server-log": "false", "server_delay": "false" },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();

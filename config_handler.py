@@ -15,6 +15,7 @@ CONFIG = {
     "CHECKOUT_COUPONS_SUFFIX": _env.get("CHECKOUT_COUPONS_SUFFIX", "cart"),
     "LOYALTY_MEMBER_ID":       _env.get("LOYALTY_MEMBER_ID",       "720100015844"),
     "USER_ID":                 int(_env.get("USER_ID",             2465729859)),
+    "DELAY_MS":                int(_env.get("DELAY_MS",            0)),
 }
 _CONFIGURABLE = set(CONFIG.keys())
 

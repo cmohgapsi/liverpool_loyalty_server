@@ -10,6 +10,7 @@ Uso:
 
 import json
 import os
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
@@ -114,6 +115,13 @@ class LoyaltyHandler(EventsHandlerMixin, ConfigHandlerMixin, LogHandlerMixin, Co
         self.send_header("Access-Control-Allow-Headers", "*")
 
     def _respond(self, code, payload):
+        path = self.path.split("?")[0]
+        delay_ms = CONFIG.get("DELAY_MS", 0)
+        if (delay_ms > 0
+                and path not in (LOG_PATH, CONFIGURATION_PATH)
+                and self.headers.get("server_delay", "").lower() != "false"):
+            time.sleep(delay_ms / 1000)
+
         body = json.dumps(payload).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type",           "application/json; charset=utf-8")
