@@ -74,6 +74,7 @@
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="cancel-enroll" />Cancel Enroll</label>
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="enroll" />Enroll</label>
       <label class="ops-radio-label"><input type="radio" name="ops-op" value="reenroll" />ReEnroll</label>
+      <label class="ops-radio-label"><input type="radio" name="ops-op" value="coupons" />Coupons</label>
     </div>
 
     <!-- Set Status -->
@@ -154,6 +155,27 @@
         <p class="ops-description">Re-enrola al usuario enviando un body vacío. Disponible cuando el estado es <code>unenrolled</code>.</p>
         <button class="ops-btn" id="btn-op-reenroll" onclick="opReEnroll()">Ejecutar</button>
         <div class="ops-feedback" id="fb-reenroll"></div>
+      </div>
+    </div>
+
+    <!-- Coupons -->
+    <div class="card ops-card" id="ops-card-coupons" style="display:none">
+      <div class="card-title">Coupons</div>
+      <div class="ops-body">
+        <button class="ops-btn ops-btn-get" id="btn-op-loyalty-coupons" onclick="opGetCoupons()">Loyalty Coupons</button>
+        <button class="ops-btn ops-btn-get" id="btn-op-redeemed-coupons" onclick="opGetRedeemedCoupons()">Redeemed Coupons</button>
+        <div class="ops-subsection">
+          <div class="ops-subsection-title">Checkout Coupons</div>
+          <div class="form-field">
+            <label class="form-label" for="op-is-buy-now">isBuyNow</label>
+            <select class="form-control" id="op-is-buy-now">
+              <option value="false">false</option>
+              <option value="true">true</option>
+            </select>
+          </div>
+          <button class="ops-btn ops-btn-get" id="btn-op-checkout-coupons" onclick="opGetCheckoutCoupons()">Checkout Coupons</button>
+        </div>
+        <div class="ops-feedback" id="fb-coupons"></div>
       </div>
     </div>
   </main>

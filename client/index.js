@@ -622,6 +622,55 @@ async function opReEnroll() {
   }
 }
 
+async function opGetCoupons() {
+  const path = config?.paths?.coupons;
+  if (!path) { opFeedback("fb-coupons", "Config no cargada", false); return; }
+  opBusy("btn-op-loyalty-coupons", true);
+  try {
+    const res  = await fetch(`${BASE_URL}${path}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-coupons", "✓ Loyalty Coupons OK", true);
+  } catch (e) {
+    opFeedback("fb-coupons", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-loyalty-coupons", false);
+  }
+}
+
+async function opGetRedeemedCoupons() {
+  const path = config?.paths?.redeemed;
+  if (!path) { opFeedback("fb-coupons", "Config no cargada", false); return; }
+  opBusy("btn-op-redeemed-coupons", true);
+  try {
+    const res  = await fetch(`${BASE_URL}${path}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-coupons", "✓ Redeemed Coupons OK", true);
+  } catch (e) {
+    opFeedback("fb-coupons", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-redeemed-coupons", false);
+  }
+}
+
+async function opGetCheckoutCoupons() {
+  const path = config?.paths?.checkoutCoupons;
+  if (!path) { opFeedback("fb-coupons", "Config no cargada", false); return; }
+  const isBuyNow = document.getElementById("op-is-buy-now").value;
+  opBusy("btn-op-checkout-coupons", true);
+  try {
+    const res  = await fetch(`${BASE_URL}${path}?isBuyNow=${isBuyNow}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data?.status?.successMessage ?? `HTTP ${res.status}`);
+    opFeedback("fb-coupons", "✓ Checkout Coupons OK", true);
+  } catch (e) {
+    opFeedback("fb-coupons", `⚠️ ${e.message}`, false);
+  } finally {
+    opBusy("btn-op-checkout-coupons", false);
+  }
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {

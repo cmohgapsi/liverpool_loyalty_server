@@ -727,6 +727,24 @@ main {
 }
 .ops-btn:hover    { background: var(--primary-dark); }
 .ops-btn:disabled { opacity: .5; cursor: not-allowed; }
+.ops-btn.ops-btn-get { background: var(--surface); color: var(--primary); border: 1px solid var(--primary); }
+.ops-btn.ops-btn-get:hover { background: #eff6ff; }
+.ops-btn.ops-btn-get:disabled { opacity: .5; cursor: not-allowed; }
+
+.ops-subsection {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ops-subsection-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+}
 
 .ops-feedback {
   font-size: 12px;
