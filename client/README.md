@@ -165,9 +165,11 @@ El botón **Aplicar cambios** envía un `PUT /configuration`. Tras la respuesta 
 
 Selector de radio buttons estilo pill (uno por operación). Al seleccionar una, se muestra el card correspondiente; las demás se ocultan. Por defecto ninguna está seleccionada.
 
-### Set Status
+### Status
 
-Envía `PATCH /<base>/users/me/loyalty/status` con la acción seleccionada y `value: true`.
+Agrupa dos operaciones sobre el endpoint de status:
+
+**PATCH Status** — envía `PATCH /<base>/users/me/loyalty/status` con la acción seleccionada y `value: true`.
 
 | Acción | Transición |
 |---|---|
@@ -175,6 +177,8 @@ Envía `PATCH /<base>/users/me/loyalty/status` con la acción seleccionada y `va
 | `enrollModalClosed` | → declined / none |
 | `displayWelcomeModal` | → enrolled / displayWelcomeModal |
 | `displayEnrollModal` | → notEnrolled / displayEnrollModal |
+
+**GET Status** — consulta `GET /<base>/users/me/loyalty/status` y muestra el `loyaltyData.status` actual en el feedback. A diferencia del refresco automático del header, esta llamada **sí se registra en el log**.
 
 ### Cancel Enroll
 
