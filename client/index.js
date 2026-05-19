@@ -12,7 +12,7 @@ const FIELD_DEFS = [
     key:     "COUPONS_LIST_SUFFIX",
     label:   "Cupones de lealtad",
     type:    "select",
-    options: ["empty", "full", "server_error", "bad_request"],
+    options: ["empty", "full", "server_error", "bad_request", "200_status_error"],
   },
   {
     key:     "COUPONS_REDEEMED_SUFFIX",

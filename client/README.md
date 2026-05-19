@@ -133,7 +133,7 @@ Permite modificar los valores configurables sin reiniciar el servidor:
 | Campo | Control | Valores posibles |
 |---|---|---|
 | Base path del BFF | `<select>` | `pocket-bff` · `web-bff` |
-| Cupones de lealtad | `<select>` | `empty` · `full` · `server_error` · `bad_request` |
+| Cupones de lealtad | `<select>` | `empty` · `full` · `server_error` · `bad_request` · `200_status_error` |
 | Cupones canjeados | `<select>` | `empty` · `full` |
 | Cupones de checkout | `<select>` | `cart` · `no_cart_error` |
 | Loyalty Member ID | texto libre | cualquier string |
