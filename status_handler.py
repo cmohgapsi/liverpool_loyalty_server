@@ -74,6 +74,7 @@ class StatusHandlerMixin:
         try:
             length = int(self.headers.get("Content-Length", 0))
             data   = json.loads(self.rfile.read(length).decode("utf-8"))
+            self._request_body = data
 
             action = data.get("action", "")
             value  = data.get("value")

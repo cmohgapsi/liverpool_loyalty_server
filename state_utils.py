@@ -40,23 +40,33 @@ def extract_http_status(raw: str) -> int:
     return 200
 
 
-def build_curl(method: str, host: str, port: int, path: str, body: dict | None = None) -> str:
+_CURL_SKIP_HEADERS = frozenset({"host", "content-length", "connection"})
+
+
+def build_curl(method: str, host: str, port: int, path: str,
+               body: dict | None = None, headers: dict | None = None) -> str:
     url   = f"http://{host}:{port}{path}"
     parts = [f'curl -X {method} "{url}"']
-    if body is not None:
+    if headers:
+        for k, v in headers.items():
+            if k.lower() not in _CURL_SKIP_HEADERS:
+                parts.append(f'-H "{k}: {v}"')
+    elif body is not None:
         parts.append('-H "Content-Type: application/json"')
+    if body is not None:
         parts.append(f"-d '{json.dumps(body, ensure_ascii=False)}'")
     return " ".join(parts)
 
 
 def log_request(method: str, host: str, port: int, path: str,
-                http_code: int, body: dict | None = None, **extras) -> dict:
+                http_code: int, body: dict | None = None,
+                headers: dict | None = None, **extras) -> dict:
     entry = {
         "method":           method,
         "path":             path,
         "http_code":        http_code,
         "request_datetime": datetime.now().isoformat(),
-        "curl":             build_curl(method, host, port, path, body),
+        "curl":             build_curl(method, host, port, path, body, headers),
         **extras,
     }
     with open(LOG_FILE, "a", encoding="utf-8") as f:
