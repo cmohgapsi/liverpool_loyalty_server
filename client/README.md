@@ -59,7 +59,7 @@ Siempre visible en la parte superior. Muestra de un vistazo el estado de la memb
 | Badge de acción | Acción pendiente del servidor (`none`, `displayWelcomeModal`, `displayEnrollModal`) |
 | Miembro desde | Fecha de alta en el programa de lealtad |
 | Nombre del usuario | `firstName` + `lastName` del estado actual |
-| **Actualizar** | Recarga el estado desde `GET /<base>/users/me/loyalty/status` |
+| **Actualizar** | Recarga el estado desde `GET /<base>/users/me` |
 | Punto SSE | Círculo verde = push activo · rojo = desconectado (reconectando) |
 | **Log** | Abre/cierra el panel de log (izquierdo) |
 | **Config** | Abre/cierra el panel de configuración (derecho) |
@@ -133,7 +133,7 @@ Permite modificar los valores configurables sin reiniciar el servidor:
 | Campo | Control | Valores posibles |
 |---|---|---|
 | Base path del BFF | `<select>` | `pocket-bff` · `web-bff` |
-| Cupones de lealtad | `<select>` | `empty` · `full` · `server_error` · `bad_request` · `200_status_error` |
+| Cupones de lealtad | `<select>` | `empty` · `full` · `qa01` · `server_error` · `bad_request` · `200_status_error` |
 | Cupones canjeados | `<select>` | `empty` · `full` |
 | Cupones de checkout | `<select>` | `cart` · `no_cart_error` |
 | Loyalty Member ID | texto libre | cualquier string |
@@ -179,7 +179,7 @@ Agrupa dos operaciones sobre el endpoint de status:
 | `displayWelcomeModal` | → enrolled / displayWelcomeModal |
 | `displayEnrollModal` | → notEnrolled / displayEnrollModal |
 
-**GET Status** — consulta `GET /<base>/users/me/loyalty/status` y muestra el `loyaltyData.status` actual en el feedback. A diferencia del refresco automático del header, esta llamada **sí se registra en el log**.
+**GET Status** — consulta `GET /<base>/users/me` y muestra el `loyaltyData.status` actual en el feedback. A diferencia del refresco automático del header, esta llamada **sí se registra en el log**.
 
 ### Cancel Enroll
 

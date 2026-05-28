@@ -26,21 +26,20 @@ Via: 1.1 google
 Alt-Svc: h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
 
 {
-  "status": {
-    "status": "OK",
-    "statusCode": 0,
-    "successMessage": "User retrieved successfully"
-  },
-  "repositoryId": "12237108594",
-  "firstName": "John",
-  "lastName": "Doe",
-  "maternalName": "Alias",
-  "gender": "male",
-  "email": "email@test.com",
-  "dateOfBirth": "12/10/1989",
-  "monederoAccNumber": 8790003681888,
-  "loyaltyData": {
-    "action": "none",
-    "status": "unenrolled"
-  }
+    "status": {
+        "status": "OK",
+        "statusCode": 0
+    },
+    "repositoryId": "2465729859",
+    "firstName": "Jesus",
+    "lastName": "Guzman",
+    "maternalName": "Mondragon",
+    "email": "jegumondragon@gmail.com",
+    "dateOfBirth": "01/01/1990",
+    "monederoAccNumber": null,
+    "gender": "male",
+    "loyaltyData": {
+        "action": "none",
+        "status": "unenrolled"
+    }
 }
