@@ -1,6 +1,5 @@
 import json
 import os
-import shutil
 
 from state_utils import extract_json_body, extract_http_status, print_operation_result, read_current_status, resolve_response_file
 
@@ -120,8 +119,30 @@ class StatusHandlerMixin:
             if not os.path.exists(src_state):
                 raise FileNotFoundError(f"State file no encontrado: {state_name}.json")
 
-            shutil.copy2(src_state, current)
-            print(f"✅  {state_name}.json  →  current_state.json")
+            with open(current, "r", encoding="utf-8") as f:
+                raw_current = f.read()
+            with open(src_state, "r", encoding="utf-8") as f:
+                raw_state = f.read()
+
+            current_body = extract_json_body(raw_current)
+            state_body   = extract_json_body(raw_state)
+
+            for key in ("loyaltyData", "monederoAccNumber"):
+                if key in state_body:
+                    current_body[key] = state_body[key]
+
+            for sep in ("\r\n\r\n", "\n\n"):
+                if sep in raw_current:
+                    header_part = raw_current.split(sep, 1)[0]
+                    updated_raw = header_part + sep + json.dumps(current_body, indent=2, ensure_ascii=False) + "\n"
+                    break
+            else:
+                updated_raw = json.dumps(current_body, indent=2, ensure_ascii=False) + "\n"
+
+            with open(current, "w", encoding="utf-8") as f:
+                f.write(updated_raw)
+
+            print(f"✅  {state_name}.json  →  current_state.json (loyaltyData + monederoAccNumber)")
 
             src_response = resolve_response_file(responses_path, self.path, f"{response_name}.json")
             if not os.path.exists(src_response):

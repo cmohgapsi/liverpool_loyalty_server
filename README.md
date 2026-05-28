@@ -559,7 +559,7 @@ Si el `action` no coincide con ningún escenario, el servidor responde `200` con
 
 ```
 📨  PATCH /pocket-bff/users/me/loyalty/status → action='welcomeModalClosed', value=True
-✅  enrolled_none_state.json  →  current_state.json
+✅  enrolled_none_state.json  →  current_state.json (loyaltyData + monederoAccNumber)
   ┌─────────────────────────────────────────────────────────────────────────────────────────┐
   │  BEFORE            →  status = NOT_ENROLLED , action = DISPLAYENROLLMODAL              │
   │  STATUS ACTION     →  welcomeModalClosed                                               │
@@ -784,7 +784,7 @@ App → PATCH /<base>/users/me/loyalty/status
         ├─ unenroll → valida status actual == enrolled → 409 si no
         ├─ unenroll → valida cancelReason (string) → 400 si falta
         ├─ Busca en SCENARIOS
-        ├─ Copia state_X.json → current_state.json
+        ├─ Merge state_X.json → current_state.json (loyaltyData + monederoAccNumber)
         └─ resolve_response_file → path_status_X.json
         │
         ▼
