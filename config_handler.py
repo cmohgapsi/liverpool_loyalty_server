@@ -26,6 +26,7 @@ def _paths() -> dict[str, str]:
     b = f"/{CONFIG['TARGET_BASE_PATH']}"
     return {
         "status":          f"{b}/users/me",
+        "status_path":     f"{b}/users/me/loyalty/status",
         "coupons":         f"{b}/users/me/loyalty/coupons",
         "redeemed":        f"{b}/users/me/loyalty/coupons/redeemed",
         "enroll":          f"{b}/users/me/loyalty/enroll",

@@ -130,12 +130,12 @@ Configura una sola regla Map Remote que cubra todos los endpoints según el `TAR
 
 **RULE** (regex — reemplaza `<base>` con el valor de `TARGET_BASE_PATH`):
 ```
-https?://[^/]+(/<base>/(?:users/me(?:/loyalty/.*)?|checkout/coupons|loyalty/cancel-reasons))
+https?://[^/]+(/<base>/(?:users/me(?:/loyalty(?:/.*)?)?|checkout/coupons|loyalty/cancel-reasons))
 ```
 
 Ejemplo con `TARGET_BASE_PATH=pocket-bff`:
 ```
-https?://[^/]+(/pocket-bff/(?:users/me(?:/loyalty/.*)?|checkout/coupons|loyalty/cancel-reasons))
+https?://[^/]+(/pocket-bff/(?:users/me(?:/loyalty(?:/.*)?)?|checkout/coupons|loyalty/cancel-reasons))
 ```
 
 **Método:** `ANY`
@@ -213,7 +213,8 @@ Devuelve la configuración activa. Los valores reflejan el estado en memoria (in
   "USER_ID": 2465729859,
   "DELAY_MS": 0,
   "paths": {
-    "status":          "/pocket-bff/users/me/loyalty/status",
+    "status":          "/pocket-bff/users/me",
+    "status_path":     "/pocket-bff/users/me/loyalty/status",
     "coupons":         "/pocket-bff/users/me/loyalty/coupons",
     "redeemed":        "/pocket-bff/users/me/loyalty/coupons/redeemed",
     "enroll":          "/pocket-bff/users/me/loyalty/enroll",

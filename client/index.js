@@ -545,7 +545,7 @@ async function opGetStatus() {
 
 async function opSetStatus() {
   const action = document.getElementById("op-status-action").value;
-  const path   = config?.paths?.status;
+  const path   = config?.paths?.status_path;
   if (!path) { opFeedback("fb-set-status", "Config no cargada", false); return; }
   opBusy("btn-op-set-status", true);
   try {
@@ -573,7 +573,7 @@ async function opCancelEnroll() {
     opFeedback("fb-cancel-enroll", selected === "__other__" ? "Escribe la razón personalizada" : "Selecciona una razón", false);
     return;
   }
-  const path = config?.paths?.status;
+  const path = config?.paths?.status_path;
   if (!path) { opFeedback("fb-cancel-enroll", "Config no cargada", false); return; }
   opBusy("btn-op-cancel", true);
   try {

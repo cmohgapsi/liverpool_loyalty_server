@@ -83,7 +83,7 @@ class LoyaltyHandler(EventsHandlerMixin, ConfigHandlerMixin, LogHandlerMixin, Co
 
     def do_PATCH(self):
         p = _paths()
-        if self.path != p["status"]:
+        if self.path != p["status_path"]:
             self._not_found()
             return
         self._handle_patch_status(STATES_PATH, RESPONSES_PATH, CURRENT)
@@ -168,7 +168,7 @@ if __name__ == "__main__":
     print(f"🌐  GET   {p['checkoutCoupons']}?isBuyNow=<bool>  [suffix={CONFIG['CHECKOUT_COUPONS_SUFFIX']}]")
     print(f"🌐  GET   {p['cancelReasons']}")
     print(f"🌐  POST  {p['enroll']}")
-    print(f"🌐  PATCH {p['status']}")
+    print(f"🌐  PATCH {p['status_path']}")
     print("     Presiona Ctrl+C para detener\n")
     try:
         server.serve_forever()
