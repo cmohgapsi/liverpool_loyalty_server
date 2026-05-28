@@ -54,7 +54,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": false,
-            "hofferType": "Descuento",
             "title": "POCKETMENOS5",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -79,7 +78,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": false,
             "claimedStatus": true,
-            "hofferType": "",
             "title": "Test Offer",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -104,7 +102,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Descuento adicional",
             "title": "Validación Descuento % + Diferido Julio",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -129,7 +126,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Descuento",
             "title": "Validación  Descuento % + Pagos Fijos",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -154,7 +150,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Monedero adicional",
             "title": "Validación Monedero % + MSI",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -179,7 +174,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Monedero",
             "title": "Validación Monedero % 10",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -204,7 +198,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Descuento adicional",
             "title": "Validación Descuento % + Monedero % Adicional",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -229,7 +222,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Monedero adicional",
             "title": "Validación Monedero % (= PMR +LEA)",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -254,7 +246,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Descuento y MSI",
             "title": "Validación Descuento % + MSI",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -279,7 +270,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Descuento",
             "title": "Validación Descuento %  Regular",
             "subtitle": "Haz válido tu beneficio ahora"
         },
@@ -304,7 +294,6 @@ Alt-Svc: h3=":443"; ma=2592000
             "displayColor": "green",
             "displayUseCoupon": true,
             "claimedStatus": true,
-            "hofferType": "Combo",
             "title": "Validación Combo 203",
             "subtitle": "Haz válido tu beneficio ahora"
         }
